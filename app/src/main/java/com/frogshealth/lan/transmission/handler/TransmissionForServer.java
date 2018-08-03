@@ -1,4 +1,8 @@
-package com.frogshealth.lan.transmission;
+package com.frogshealth.lan.transmission.handler;
+
+import com.frogshealth.lan.transmission.LanApplication;
+import com.frogshealth.lan.transmission.net.FileReceiver;
+import com.frogshealth.lan.transmission.utils.Const;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -41,7 +45,7 @@ public class TransmissionForServer {
                 while (!Thread.currentThread().isInterrupted()) {
                     Socket socket = serverSocket.accept();
                     FileReceiver fileReceiver = new FileReceiver(socket);
-                    AppContext.MAINEXECUTOR.execute(fileReceiver);
+                    LanApplication.MAINEXECUTOR.execute(fileReceiver);
                 }
             } catch (IOException e) {
                 e.printStackTrace();

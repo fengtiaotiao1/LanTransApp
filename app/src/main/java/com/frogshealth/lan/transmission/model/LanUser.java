@@ -1,10 +1,10 @@
-package com.frogshealth.lan.transmission;
+package com.frogshealth.lan.transmission.model;
 
 /**********************************************************************
  * 局域网用户
  *
  * @类名 LanUser
- * @包名 com.frogshealth.lan.transmission
+ * @包名 com.frogshealth.lan.transmission.model
  * @author yuanjf
  * @创建日期 18/8/1
  ***********************************************************************/
@@ -17,6 +17,10 @@ public class LanUser {
      * IP地址
      */
     private String mIp;
+
+    public LanUser(String userName) {
+        this.mUserName = userName;
+    }
 
     public String getUserName() {
         return mUserName;

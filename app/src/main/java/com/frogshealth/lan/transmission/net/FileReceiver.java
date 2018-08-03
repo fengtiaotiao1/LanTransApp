@@ -1,6 +1,7 @@
-package com.frogshealth.lan.transmission;
+package com.frogshealth.lan.transmission.net;
 
-import com.frogshealth.lan.entity.FileInfo;
+import com.frogshealth.lan.transmission.model.FileInfo;
+import com.frogshealth.lan.transmission.utils.Const;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;

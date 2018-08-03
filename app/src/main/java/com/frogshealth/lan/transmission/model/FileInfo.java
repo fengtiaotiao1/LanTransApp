@@ -1,4 +1,4 @@
-package com.frogshealth.lan.entity;
+package com.frogshealth.lan.transmission.model;
 
 import com.google.gson.Gson;
 

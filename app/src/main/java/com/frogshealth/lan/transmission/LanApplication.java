@@ -14,7 +14,7 @@ import java.util.concurrent.Executors;
  * @author hanchao@frogshealth.com
  * @创建日期 2018/8/3
  ***********************************************************************/
-public class AppContext extends Application {
+public class LanApplication extends Application {
     /**
      * 线程池
      */

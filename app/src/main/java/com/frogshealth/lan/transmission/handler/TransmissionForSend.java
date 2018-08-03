@@ -1,6 +1,8 @@
-package com.frogshealth.lan.transmission;
+package com.frogshealth.lan.transmission.handler;
 
-import com.frogshealth.lan.entity.FileInfo;
+import com.frogshealth.lan.transmission.model.FileInfo;
+import com.frogshealth.lan.transmission.LanApplication;
+import com.frogshealth.lan.transmission.net.FileSender;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -28,7 +30,7 @@ public class TransmissionForSend {
     private void sendFiles(String address, int port) {
         for (FileInfo file : mFiles) {
             FileSender fileSender = new FileSender(file, address, port);
-            AppContext.FILE_SENDER_EXECUTOR.execute(fileSender);
+            LanApplication.FILE_SENDER_EXECUTOR.execute(fileSender);
         }
     }
 
