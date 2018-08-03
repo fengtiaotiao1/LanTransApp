@@ -1,7 +1,6 @@
 package com.frogshealth.lan.transmission;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,6 +44,7 @@ public class LanUserAdapter extends BaseAdapter {
 
     /**
      * 增加数据源
+     *
      * @param userLst 用户列表
      */
     public void setUserLst(List<LanUser> userLst) {
@@ -58,23 +58,29 @@ public class LanUserAdapter extends BaseAdapter {
 
     /**
      * 增加数据源
+     *
      * @param user 用户
      */
     public void addUser(LanUser user) {
         if (user == null) {
             return;
         }
+        boolean isAdd = true;
         for (LanUser temp : mLanUserList) {
-            if (!temp.getUserName().equals(user.getUserName())) {
-                mLanUserList.add(user);
+            if (temp.getUserName().equals(user.getUserName())) {
+                isAdd = false;
                 break;
             }
         }
-        notifyDataSetChanged();
+        if (isAdd) {
+            mLanUserList.add(user);
+            notifyDataSetChanged();
+        }
     }
 
     /**
      * 删除数据源
+     *
      * @param user 用户
      */
     public void deleteUser(LanUser user) {

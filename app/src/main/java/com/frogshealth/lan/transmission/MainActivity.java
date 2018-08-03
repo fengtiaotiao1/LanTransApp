@@ -107,7 +107,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         mLvDeviceList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String deviceInfo = mLanUserList.get(position).getUserName() + " : " + mLanUserList.get(position).getIp();
+                String deviceInfo = mLanUserList.get(position).getUserName();
                 mTvDeviceInfo.setText(deviceInfo);
             }
         });
