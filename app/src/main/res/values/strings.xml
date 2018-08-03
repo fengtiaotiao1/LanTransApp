@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">LanTransApp</string>
+    <string name="please_choose_device">请选择先设备</string>
+    <string name="please_choose_file">请选择先文件</string>
+    <string name="receive_from">接受到来自</string>
+    <string name="from_file">的文件</string>
+    <string name="accept">接受</string>
+    <string name="refuse">拒绝</string>
+    <string name="layout_add_file">选择文件</string>
 </resources>

@@ -26,7 +26,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <service android:name=".service.LanTransService"/>
+
+        <activity android:name=".BaseActivity"/>
+        <activity android:name=".ChooseFileActivity"/>
     </application>
 
 </manifest>

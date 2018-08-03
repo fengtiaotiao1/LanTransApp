@@ -22,6 +22,11 @@ public class LanUser {
         this.mUserName = userName;
     }
 
+    public LanUser(String userName, String ip) {
+        this.mUserName = userName;
+        this.mIp = ip;
+    }
+
     public String getUserName() {
         return mUserName;
     }
