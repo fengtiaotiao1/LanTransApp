@@ -27,5 +27,33 @@ public class Const {
      * 用户上线应答
      */
     public static final int MSG_ONLINE_ANSWER = 0x00000003;
+    /**
+     * UTF-8
+     */
+    public static final String UTF8 = "UTF-8";
 
+    /**
+     * 头部分割字符
+     */
+    public static final String SPERATOR = "::";
+
+    /**
+     * 每次读取字节数组长度
+     */
+    public static final int BYTE_SIZE_DATA = 1024 * 4;
+
+    /**
+     * 传输文件类型
+     */
+    public static final int TYPE_FILE = 1; //文件类型
+
+    /**
+     * 文件传输监听 默认端口
+     */
+    public static final int DEFAULT_SERVER_PORT = 8080;
+
+    /**
+     * 文件保存路径
+     */
+    public static final String SAVEPATH = "/Users/apple/Documents/copyFile/";
 }
