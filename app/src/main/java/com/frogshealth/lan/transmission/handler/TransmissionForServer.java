@@ -1,11 +1,11 @@
 package com.frogshealth.lan.transmission.handler;
 
-import android.content.Context;
 
 import com.frogshealth.lan.transmission.LanApplication;
 import com.frogshealth.lan.transmission.net.FileReceiver;
 import com.frogshealth.lan.transmission.utils.Const;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -21,10 +21,11 @@ import java.net.Socket;
  ***********************************************************************/
 public class TransmissionForServer {
     /**
-     * 开启服务
+     * 开始保存
+     * @param file 文件保存路径 调用LanApplication的getIndividualCacheDirectory方法获得
      */
-    public void startServer(Context context) {
-        new Thread(new ServerRunnable(Const.DEFAULT_SERVER_PORT, context)).start();
+    public void startServer(File file) {
+        new Thread(new ServerRunnable(Const.DEFAULT_SERVER_PORT, file)).start();
     }
 
     /**
@@ -36,13 +37,13 @@ public class TransmissionForServer {
          */
         private int mPort;
         /**
-         * Context
+         * File
          */
-        private Context mContext;
+        private File mFile;
 
-        ServerRunnable(int port, Context context) {
+        ServerRunnable(int port, File file) {
             this.mPort = port;
-            this.mContext = context;
+            this.mFile = file;
         }
 
         @Override
@@ -51,7 +52,7 @@ public class TransmissionForServer {
                 ServerSocket serverSocket = new ServerSocket(this.mPort);
                 while (!Thread.currentThread().isInterrupted()) {
                     Socket socket = serverSocket.accept();
-                    FileReceiver fileReceiver = new FileReceiver(socket, mContext);
+                    FileReceiver fileReceiver = new FileReceiver(socket, mFile);
                     LanApplication.MAINEXECUTOR.execute(fileReceiver);
                 }
             } catch (IOException e) {

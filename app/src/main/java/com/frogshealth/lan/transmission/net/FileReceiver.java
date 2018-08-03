@@ -1,8 +1,5 @@
 package com.frogshealth.lan.transmission.net;
 
-import android.content.Context;
-
-import com.frogshealth.lan.transmission.LanApplication;
 import com.frogshealth.lan.transmission.model.FileInfo;
 import com.frogshealth.lan.transmission.utils.Const;
 
@@ -39,18 +36,13 @@ public class FileReceiver implements Runnable {
      */
     private FileInfo mFileInfo;
     /**
-     * LanApplication
+     * File
      */
-    private LanApplication mLanApplication;
-    /**
-     * Context
-     */
-    private Context mContext;
+    private File mFile;
 
-    public FileReceiver(Socket mSocket, Context context) {
+    public FileReceiver(Socket mSocket, File file) {
         this.mSocket = mSocket;
-        this.mLanApplication = (LanApplication) context.getApplicationContext();
-        this.mContext = context;
+        this.mFile = file;
     }
 
 
@@ -129,8 +121,7 @@ public class FileReceiver implements Runnable {
      * @throws IOException 异常
      */
     private void saveFile() throws IOException {
-        File sdPath = mLanApplication.getIndividualCacheDirectory(mContext);
-        File savePath = new File(sdPath, mFileInfo.getFileName());
+        File savePath = new File(mFile, mFileInfo.getFileName());
         OutputStream bos = new FileOutputStream(savePath);
         byte[] bytes = new byte[Const.BYTE_SIZE_DATA];
         int len = 0;
