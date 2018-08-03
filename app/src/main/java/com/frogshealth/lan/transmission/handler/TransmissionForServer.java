@@ -1,5 +1,7 @@
 package com.frogshealth.lan.transmission.handler;
 
+import android.content.Context;
+
 import com.frogshealth.lan.transmission.LanApplication;
 import com.frogshealth.lan.transmission.net.FileReceiver;
 import com.frogshealth.lan.transmission.utils.Const;
@@ -21,8 +23,8 @@ public class TransmissionForServer {
     /**
      * 开启服务
      */
-    public void startServer() {
-        new Thread(new ServerRunnable(Const.DEFAULT_SERVER_PORT)).start();
+    public void startServer(Context context) {
+        new Thread(new ServerRunnable(Const.DEFAULT_SERVER_PORT, context)).start();
     }
 
     /**
@@ -33,9 +35,14 @@ public class TransmissionForServer {
          * 端口号
          */
         private int mPort;
+        /**
+         * Context
+         */
+        private Context mContext;
 
-        ServerRunnable(int port) {
+        ServerRunnable(int port, Context context) {
             this.mPort = port;
+            this.mContext = context;
         }
 
         @Override
@@ -44,7 +51,7 @@ public class TransmissionForServer {
                 ServerSocket serverSocket = new ServerSocket(this.mPort);
                 while (!Thread.currentThread().isInterrupted()) {
                     Socket socket = serverSocket.accept();
-                    FileReceiver fileReceiver = new FileReceiver(socket);
+                    FileReceiver fileReceiver = new FileReceiver(socket, mContext);
                     LanApplication.MAINEXECUTOR.execute(fileReceiver);
                 }
             } catch (IOException e) {

@@ -69,5 +69,5 @@ public class Const {
     /**
      * 文件保存路径
      */
-    public static final String SAVEPATH = "/Users/apple/Documents/copyFile/";
+    public static final String SAVEPATH = "file-save";
 }
