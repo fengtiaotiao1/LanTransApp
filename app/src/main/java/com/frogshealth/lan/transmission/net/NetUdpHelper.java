@@ -174,7 +174,7 @@ public class NetUdpHelper implements Runnable {
      * @return 局域网用户列表
      */
     public List<LanUser> getLanUsers() {
-        return mUsers;
+        return new ArrayList<>(mUsers);
     }
 
     /**
@@ -259,7 +259,7 @@ public class NetUdpHelper implements Runnable {
             e.printStackTrace();
             this.release();
         }
-        noticeOnline();
+//        noticeOnline();
     }
 
     /**
@@ -277,7 +277,7 @@ public class NetUdpHelper implements Runnable {
     /**
      * 发送上线广播
      */
-    private void noticeOnline() {
+    public void noticeOnline() {
         UdpMsgProtocol msg = new UdpMsgProtocol(Const.MSG_USER_ONLINE);
         msg.setAddress(mLocalIp);
         msg.setToAddress(Const.BROADCAST_ADDR);
@@ -309,7 +309,6 @@ public class NetUdpHelper implements Runnable {
         if (name.equals(mLocalIp)) {
             return;
         }
-
         Iterator iterator = mUsers.iterator();
         while (iterator.hasNext()) {
             LanUser user = (LanUser) iterator.next();

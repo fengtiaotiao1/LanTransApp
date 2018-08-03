@@ -20,10 +20,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.frogshealth.lan.transmission.handler.LanTransAgent;
+import com.frogshealth.lan.transmission.listener.UserStateListener;
 import com.frogshealth.lan.transmission.model.LanUser;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 /**********************************************************************
  * MainActivity
@@ -33,7 +36,7 @@ import java.util.ArrayList;
  * @author yuanjf
  * @创建日期 18/8/1
  ***********************************************************************/
-public class MainActivity extends BaseActivity implements View.OnClickListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener, UserStateListener{
     /**
      * TAG
      */
@@ -53,7 +56,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     /**
      * 设备List
      */
-    private ArrayList<LanUser> mLanUserList = new ArrayList<>();
+    private List<LanUser> mLanUserList = new ArrayList<>();
     /**
      * 搜索的dialog
      */
@@ -66,6 +69,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
      * 接受文件进度的dialog
      */
     private ReceiveProgressDialog mReceiveProgressDialog;
+    /**
+     * 用户列表适配
+     */
+    private LanUserAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +80,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         setContentView(R.layout.activity_main);
         mContext = MainActivity.this;
         bindViews();
+        initListener();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        LanTransAgent.getInstance(this).release();
     }
 
     /**
@@ -88,8 +102,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         mProgressLoadDialog = new AlertDialog.Builder(this, R.style.dialog).create();
         mReceiveDialog = new AlertDialog.Builder(this);
 
-        LanUserAdapter adapter = new LanUserAdapter(mContext, mLanUserList);
-        mLvDeviceList.setAdapter(adapter);
+        mAdapter = new LanUserAdapter(mContext, mLanUserList);
+        mLvDeviceList.setAdapter(mAdapter);
         mLvDeviceList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -162,6 +176,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         mProgressLoadDialog.setCancelable(true);
         mProgressLoadDialog.setContentView(R.layout.progressbar_finddevice);
         mHandler.sendEmptyMessageDelayed(DISCOVERY_DEVICE, 3000);
+        mLanUserList = LanTransAgent.getInstance(this).getLanUsers();
+        mAdapter.setUserLst(mLanUserList);
     }
 
     /**
@@ -323,5 +339,30 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
      */
     private boolean isGooglePhotosUri(Uri uri) {
         return "com.google.android.apps.photos.content".equals(uri.getAuthority());
+    }
+
+    private void initListener() {
+        LanTransAgent.getInstance(this).registerUserListener(this);
+        LanTransAgent.getInstance(this).onlineNotify();
+    }
+
+    @Override
+    public void online(final LanUser user) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mAdapter.addUser(user);
+            }
+        });
+    }
+
+    @Override
+    public void offline(final LanUser user) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mAdapter.deleteUser(user);
+            }
+        });
     }
 }

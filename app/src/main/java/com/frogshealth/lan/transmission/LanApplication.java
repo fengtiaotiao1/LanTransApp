@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
+import com.frogshealth.lan.transmission.handler.LanTransAgent;
 import com.frogshealth.lan.transmission.utils.Const;
 
 import java.io.File;
@@ -39,6 +40,7 @@ public class LanApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        LanTransAgent.getInstance(this).init();
     }
 
     /**

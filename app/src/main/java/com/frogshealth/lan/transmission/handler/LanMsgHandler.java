@@ -3,6 +3,7 @@ package com.frogshealth.lan.transmission.handler;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
+import android.util.Log;
 
 import com.frogshealth.lan.transmission.listener.FileOperateListener;
 import com.frogshealth.lan.transmission.listener.UserStateListener;

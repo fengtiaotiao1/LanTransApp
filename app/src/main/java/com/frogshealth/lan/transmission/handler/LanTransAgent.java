@@ -36,6 +36,10 @@ public class LanTransAgent {
      * 消息处理
      */
     private LanMsgHandler mHandler;
+    /**
+     * 消息处理线程
+     */
+    private HandlerThread mThread;
 
     private LanTransAgent(Context context) {
         this.mContext = context;
@@ -152,9 +156,31 @@ public class LanTransAgent {
      */
     public void init() {
 //        bindService();
-        HandlerThread thread = new HandlerThread("lan-trans");
-        thread.start();
-        mHandler = new LanMsgHandler(thread);
+        mThread = new HandlerThread("lan-trans");
+        mThread.start();
+        mHandler = new LanMsgHandler(mThread);
         NetUdpHelper.getInstance().init(mHandler);
+    }
+
+    /**
+     * 资源释放
+     */
+    public void release() {
+        if (mHandler != null) {
+            mHandler.removeCallbacksAndMessages(null);
+            mHandler = null;
+        }
+        if (mThread != null) {
+            mThread.quit();
+            mThread = null;
+        }
+        NetUdpHelper.getInstance().release();
+    }
+
+    /**
+     * 上线通知
+     */
+    public void onlineNotify() {
+        NetUdpHelper.getInstance().noticeOnline();
     }
 }

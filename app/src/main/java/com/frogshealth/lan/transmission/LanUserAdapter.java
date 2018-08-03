@@ -1,6 +1,7 @@
 package com.frogshealth.lan.transmission;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 import com.frogshealth.lan.transmission.model.LanUser;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**********************************************************************
  * 显示设备信息的Adapter
@@ -28,7 +30,7 @@ public class LanUserAdapter extends BaseAdapter {
     /**
      * LanUser模型list
      */
-    private ArrayList<LanUser> mLanUserList = new ArrayList<>();
+    private List<LanUser> mLanUserList = new ArrayList<>();
 
     /**
      * 构造方法
@@ -36,9 +38,51 @@ public class LanUserAdapter extends BaseAdapter {
      * @param context  上下文
      * @param lanUsers 用户List
      */
-    public LanUserAdapter(Context context, ArrayList<LanUser> lanUsers) {
+    public LanUserAdapter(Context context, List<LanUser> lanUsers) {
         this.mContext = context;
         this.mLanUserList = lanUsers;
+    }
+
+    /**
+     * 增加数据源
+     * @param userLst 用户列表
+     */
+    public void setUserLst(List<LanUser> userLst) {
+        if (userLst == null || userLst.isEmpty()) {
+            return;
+        }
+        mLanUserList.clear();
+        mLanUserList.addAll(userLst);
+        notifyDataSetChanged();
+    }
+
+    /**
+     * 增加数据源
+     * @param user 用户
+     */
+    public void addUser(LanUser user) {
+        if (user == null) {
+            return;
+        }
+        for (LanUser temp : mLanUserList) {
+            if (!temp.getUserName().equals(user.getUserName())) {
+                mLanUserList.add(user);
+                break;
+            }
+        }
+        notifyDataSetChanged();
+    }
+
+    /**
+     * 删除数据源
+     * @param user 用户
+     */
+    public void deleteUser(LanUser user) {
+        if (user == null) {
+            return;
+        }
+        mLanUserList.remove(user);
+        notifyDataSetChanged();
     }
 
     @Override
