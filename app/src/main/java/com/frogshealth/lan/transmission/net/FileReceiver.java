@@ -1,10 +1,11 @@
 package com.frogshealth.lan.transmission.net;
 
+
+import com.frogshealth.lan.transmission.listener.FileStatusListener;
 import com.frogshealth.lan.transmission.model.FileInfo;
 import com.frogshealth.lan.transmission.utils.Const;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,7 +22,10 @@ import java.net.Socket;
  * @创建日期 2018/8/3
  ***********************************************************************/
 public class FileReceiver implements Runnable {
-
+    /**
+     * Log
+     */
+    private static final String TAG = FileReceiver.class.getName();
     /**
      * Socket
      */
@@ -39,39 +43,58 @@ public class FileReceiver implements Runnable {
      * File
      */
     private File mFile;
+    /**
+     * 文件传输状态监听
+     */
+    private FileStatusListener mFileStatusListener;
 
     public FileReceiver(Socket mSocket, File file) {
         this.mSocket = mSocket;
         this.mFile = file;
     }
 
+    /**
+     * 设置文件传输监听
+     *
+     * @param statusListener 传输监听
+     */
+    public void setFileStatusListener(FileStatusListener statusListener) {
+        this.mFileStatusListener = statusListener;
+    }
+
 
     @Override
     public void run() {
         try {
+            if (mFileStatusListener != null) {
+                mFileStatusListener.startTransmission();
+            }
             init();
         } catch (Exception e) {
-            e.printStackTrace();
+            if (mFileStatusListener != null) {
+                mFileStatusListener.fail(e);
+            }
         }
-
         try {
             parseHeader();
         } catch (IOException e) {
-            e.printStackTrace();
+            if (mFileStatusListener != null) {
+                mFileStatusListener.fail(e);
+            }
         }
-
         try {
             saveFile();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            if (mFileStatusListener != null) {
+                mFileStatusListener.fail(e);
+            }
         }
         finish();
     }
 
     /**
      * 解析附加信息
+     *
      * @throws IOException 异常
      */
     private void parseHeader() throws IOException {
@@ -90,9 +113,6 @@ public class FileReceiver implements Runnable {
         String[] strArray = jsonStr.split(Const.SPERATOR);
         jsonStr = strArray[1].trim();
         mFileInfo = FileInfo.toObject(jsonStr);
-
-        System.out.println("mFileInfo = " + mFileInfo);
-
     }
 
     /**
@@ -116,8 +136,10 @@ public class FileReceiver implements Runnable {
         }
     }
 
+
     /**
      * 保存文件
+     *
      * @throws IOException 异常
      */
     private void saveFile() throws IOException {
@@ -128,14 +150,23 @@ public class FileReceiver implements Runnable {
         OutputStream bos = new FileOutputStream(savePath);
         byte[] bytes = new byte[Const.BYTE_SIZE_DATA];
         int len = 0;
+        int alreadyReadBytes = 0;
         while ((len = mInputStream.read(bytes)) != -1) {
             bos.write(bytes, 0, len);
+            alreadyReadBytes += len;
+            if(mFileStatusListener != null) {
+                mFileStatusListener.upload(mFileInfo.getFileName(), alreadyReadBytes, mFileInfo.getFileSize());
+            }
+        }
+        if(mFileStatusListener != null) {
+            mFileStatusListener.success();
         }
         bos.close();
     }
 
     /**
      * 初始化
+     *
      * @throws Exception 异常
      */
     private void init() throws Exception {

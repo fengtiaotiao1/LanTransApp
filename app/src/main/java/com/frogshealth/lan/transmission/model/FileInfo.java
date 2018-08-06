@@ -20,10 +20,23 @@ public class FileInfo {
      * 文件名称
      */
     private String mFileName;
+    /**
+     * 文件的长度
+     */
+    private long mFileSize;
 
-    public FileInfo(String mPath, String mFileName) {
+    public long getFileSize() {
+        return mFileSize;
+    }
+
+    public void setFileSize(long mFileSize) {
+        this.mFileSize = mFileSize;
+    }
+
+    public FileInfo(String mPath, String mFileName, long mFileSize) {
         this.mPath = mPath;
         this.mFileName = mFileName;
+        this.mFileSize = mFileSize;
     }
 
     public FileInfo() {

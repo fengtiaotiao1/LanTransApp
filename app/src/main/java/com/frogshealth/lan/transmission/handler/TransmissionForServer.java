@@ -2,6 +2,7 @@ package com.frogshealth.lan.transmission.handler;
 
 
 import com.frogshealth.lan.transmission.LanApplication;
+import com.frogshealth.lan.transmission.listener.FileStatusListener;
 import com.frogshealth.lan.transmission.net.FileReceiver;
 import com.frogshealth.lan.transmission.utils.Const;
 
@@ -53,6 +54,28 @@ public class TransmissionForServer {
                 while (!Thread.currentThread().isInterrupted()) {
                     Socket socket = serverSocket.accept();
                     FileReceiver fileReceiver = new FileReceiver(socket, mFile);
+                    fileReceiver.setFileStatusListener(new FileStatusListener() {
+
+                        @Override
+                        public void startTransmission() {
+                            System.out.println("XXX startTransmission");
+                        }
+
+                        @Override
+                        public void upload(String fileName, long schedule, long fileSize) {
+//                            System.out.println("XXX fileName = " + fileName + ", schedule = " + schedule + ", fileSize = " + fileSize);
+                        }
+
+                        @Override
+                        public void success() {
+                            System.out.println("XXX success");
+                        }
+
+                        @Override
+                        public void fail(Exception e) {
+                            System.out.println("XXX fail");
+                        }
+                    });
                     LanApplication.MAINEXECUTOR.execute(fileReceiver);
                 }
             } catch (IOException e) {

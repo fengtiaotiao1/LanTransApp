@@ -41,7 +41,7 @@ public class TransmissionForSend {
     public void files2FileInfo(List<File> files) {
         for (int i = 0; i < files.size(); i++) {
             File file = files.get(i);
-            FileInfo info = new FileInfo(file.getAbsolutePath(), getFileName(file.getAbsolutePath()));
+            FileInfo info = new FileInfo(file.getAbsolutePath(), getFileName(file.getAbsolutePath()), file.length());
             mFiles.add(info);
         }
     }

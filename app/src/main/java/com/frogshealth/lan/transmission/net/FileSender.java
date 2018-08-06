@@ -1,5 +1,6 @@
 package com.frogshealth.lan.transmission.net;
 
+
 import com.frogshealth.lan.transmission.model.FileInfo;
 import com.frogshealth.lan.transmission.utils.Const;
 
@@ -22,7 +23,10 @@ import java.net.Socket;
  ***********************************************************************/
 public class FileSender implements Runnable {
 
-
+    /**
+     * log
+     */
+    private static final String TAG = FileSender.class.getName();
     /**
      * 发送的文件
      */
@@ -97,6 +101,9 @@ public class FileSender implements Runnable {
      * 结束
      */
     private void finish() {
+//        closeSocketInput(mSocket);
+//        closeSocketOutput(mSocket);
+//        closeSocket(mSocket);
         if (mOutputStream != null) {
             try {
                 mOutputStream.close();
@@ -114,6 +121,7 @@ public class FileSender implements Runnable {
         }
     }
 
+
     /**
      * 发送文件
      *
@@ -127,7 +135,6 @@ public class FileSender implements Runnable {
             mOutputStream.write(bytes, 0, len);
         }
         mOutputStream.flush();
-        mOutputStream.close();
     }
 
     /**
