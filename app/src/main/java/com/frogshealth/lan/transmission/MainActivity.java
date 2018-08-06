@@ -1,17 +1,12 @@
 package com.frogshealth.lan.transmission;
 
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.DocumentsContract;
-import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
@@ -23,8 +18,9 @@ import android.widget.Toast;
 import com.frogshealth.lan.transmission.handler.LanTransAgent;
 import com.frogshealth.lan.transmission.listener.UserStateListener;
 import com.frogshealth.lan.transmission.model.LanUser;
+import com.leon.lfilepickerlibrary.LFilePicker;
+import com.leon.lfilepickerlibrary.utils.Constant;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,11 +32,15 @@ import java.util.List;
  * @author yuanjf
  * @创建日期 18/8/1
  ***********************************************************************/
-public class MainActivity extends BaseActivity implements View.OnClickListener, UserStateListener{
+public class MainActivity extends BaseActivity implements View.OnClickListener, UserStateListener {
     /**
      * TAG
      */
     private static final String TAG = "MainActivity";
+    /**
+     * 默认文件选择路径
+     */
+    private static final String PATH = Environment.getExternalStorageDirectory().getPath() + "/com.tencent.ma.app/log/";
     /**
      * 上下文
      */
@@ -140,23 +140,22 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
      * 选择文件
      */
     private void chooseFile() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("*/*");
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        startActivityForResult(intent, 10);
+        new LFilePicker()
+                .withActivity(MainActivity.this)
+                .withChooseMode(true)
+                .withNotFoundBooks(getString(R.string.no_select_file))
+                .withStartPath(PATH)
+                .start();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 10 && resultCode == RESULT_OK) {
-            Uri uri = data.getData();
-            if (uri != null) {
-                String path = getAbsolutePath(mContext, uri);
-                Log.e(TAG, "onActivityResult: " + path);
-                File file = new File(path);
-                Log.e(TAG, "onActivityResult: " + file.length());
-                mTvFileInfo.setText(path);
+        if (resultCode == RESULT_OK) {
+            List<String> list = data.getStringArrayListExtra(Constant.RESULT_INFO);
+            if (list != null) {
+                Toast.makeText(getApplicationContext(), String.format(getString(R.string.selected_file_size), list.size()), Toast.LENGTH_SHORT).show();
+                mTvFileInfo.setText(list.get(0));
             }
         }
     }
@@ -227,120 +226,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     });
 
     /**
-     * 根据uri获取文件绝对路径
-     *
-     * @param context  上下文
-     * @param uri uri
-     * @return 绝对路径
+     * 初始化监听
      */
-    private String getAbsolutePath(Context context, Uri uri) {
-        if (context == null || uri == null) {
-            return null;
-        }
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT && DocumentsContract.isDocumentUri(context, uri)) {
-            if (isExternalStorageDocument(uri)) {
-                String docId = DocumentsContract.getDocumentId(uri);
-                String[] split = docId.split(":");
-                String type = split[0];
-                if ("primary".equalsIgnoreCase(type)) {
-                    return Environment.getExternalStorageDirectory() + "/" + split[1];
-                }
-            } else if (isDownloadsDocument(uri)) {
-                String id = DocumentsContract.getDocumentId(uri);
-                Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
-                return getDataColumn(context, contentUri, null, null);
-            } else if (isMediaDocument(uri)) {
-                String docId = DocumentsContract.getDocumentId(uri);
-                String[] split = docId.split(":");
-                String type = split[0];
-                Uri contentUri = null;
-                if ("image".equals(type)) {
-                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-                } else if ("video".equals(type)) {
-                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-                } else if ("audio".equals(type)) {
-                    contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-                }
-                String selection = MediaStore.Images.Media._ID + "=?";
-                String[] selectionArgs = new String[]{split[1]};
-                return getDataColumn(context, contentUri, selection, selectionArgs);
-            }
-        } else if ("content".equalsIgnoreCase(uri.getScheme())) {
-            if (isGooglePhotosUri(uri))
-                return uri.getLastPathSegment();
-            return getDataColumn(context, uri, null, null);
-        } else if ("file".equalsIgnoreCase(uri.getScheme())) {
-            return uri.getPath();
-        }
-        return null;
-    }
-
-    /**
-     * 获取路径
-     *
-     * @param context       上下文
-     * @param uri           uri
-     * @param selection     select语句
-     * @param selectionArgs select参数
-     * @return 绝对路径
-     */
-    private String getDataColumn(Context context, Uri uri, String selection, String[] selectionArgs) {
-        Cursor cursor = null;
-        String column = MediaStore.Images.Media.DATA;
-        String[] projection = {column};
-        try {
-            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs, null);
-            if (cursor != null && cursor.moveToFirst()) {
-                int index = cursor.getColumnIndexOrThrow(column);
-                return cursor.getString(index);
-            }
-        } finally {
-            if (cursor != null)
-                cursor.close();
-        }
-        return null;
-    }
-
-    /**
-     * 判断是否是SD卡uri
-     *
-     * @param uri uri
-     * @return 是否正确
-     */
-    private boolean isExternalStorageDocument(Uri uri) {
-        return "com.android.externalstorage.documents".equals(uri.getAuthority());
-    }
-
-    /**
-     * 是否是下载文件
-     *
-     * @param uri uri
-     * @return 是否正确
-     */
-    private boolean isDownloadsDocument(Uri uri) {
-        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
-    }
-
-    /**
-     * 是否为媒体文件
-     *
-     * @param uri uri
-     * @return 是否正确
-     */
-    private boolean isMediaDocument(Uri uri) {
-        return "com.android.providers.media.documents".equals(uri.getAuthority());
-    }
-
-    /**
-     * 是否为照片文件
-     *
-     * @param uri uri
-     * @return 是否正确
-     */
-    private boolean isGooglePhotosUri(Uri uri) {
-        return "com.google.android.apps.photos.content".equals(uri.getAuthority());
-    }
-
     private void initListener() {
         LanTransAgent.getInstance(this).registerUserListener(this);
         LanTransAgent.getInstance(this).onlineNotify();
