@@ -27,7 +27,7 @@ public class TransmissionForSend {
      * @param address 地址
      * @param port 端口号
      */
-    private void sendFiles(String address, int port) {
+    public void sendFiles(String address, int port) {
         for (FileInfo file : mFiles) {
             FileSender fileSender = new FileSender(file, address, port);
             LanApplication.FILE_SENDER_EXECUTOR.execute(fileSender);
@@ -38,7 +38,7 @@ public class TransmissionForSend {
      * 文件转换为FileInfo
      * @param files 文件列表
      */
-    private void files2FileInfo(List<File> files) {
+    public void files2FileInfo(List<File> files) {
         for (int i = 0; i < files.size(); i++) {
             File file = files.get(i);
             FileInfo info = new FileInfo(file.getAbsolutePath(), getFileName(file.getAbsolutePath()));

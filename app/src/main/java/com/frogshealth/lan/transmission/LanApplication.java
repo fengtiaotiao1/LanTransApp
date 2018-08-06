@@ -50,7 +50,7 @@ public class LanApplication extends Application {
      */
     public File getIndividualCacheDirectory(Context context) {
         File cacheDir = getCacheDirectory(context, true);
-        return new File(cacheDir, Const.SAVEPATH);
+        return new File(cacheDir, Const.SAVE_PATH);
     }
 
     /**

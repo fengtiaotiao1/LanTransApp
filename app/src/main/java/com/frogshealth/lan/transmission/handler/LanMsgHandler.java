@@ -3,7 +3,6 @@ package com.frogshealth.lan.transmission.handler;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
-import android.util.Log;
 
 import com.frogshealth.lan.transmission.listener.FileOperateListener;
 import com.frogshealth.lan.transmission.listener.UserStateListener;
@@ -41,7 +40,7 @@ public class LanMsgHandler extends Handler {
             case Const.MSG_FILE_RECEIVE:
             case Const.MSG_FILE_REJECT:
             case Const.MSG_FILE_SEND_REQUEST:
-                handleFileMsg(msg.what);
+                handleFileMsg(msg.what, (LanUser) msg.obj);
                 break;
             case Const.MSG_USER_ONLINE:
             case Const.MSG_USER_OFFLINE:
@@ -108,8 +107,9 @@ public class LanMsgHandler extends Handler {
      * 处理文件消息
      *
      * @param msgType 消息类型
+     * @param user    用户信息
      */
-    private void handleFileMsg(int msgType) {
+    private void handleFileMsg(int msgType, LanUser user) {
         synchronized (mFileListeners) {
             for (FileOperateListener listener : mFileListeners) {
                 if (listener == null) {
@@ -123,7 +123,7 @@ public class LanMsgHandler extends Handler {
                         listener.onReject();
                         break;
                     case Const.MSG_FILE_SEND_REQUEST:
-                        listener.onSendRequest();
+                        listener.onSendRequest(user);
                         break;
                     default:
                         break;

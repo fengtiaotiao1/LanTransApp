@@ -1,5 +1,7 @@
 package com.frogshealth.lan.transmission.listener;
 
+import com.frogshealth.lan.transmission.model.LanUser;
+
 /**********************************************************************
  * 文件操作监听类。
  *
@@ -11,8 +13,10 @@ package com.frogshealth.lan.transmission.listener;
 public interface FileOperateListener {
     /**
      * 发送请求
+     *
+     * @param user 用户
      */
-    void onSendRequest();
+    void onSendRequest(LanUser user);
 
     /**
      * 接收

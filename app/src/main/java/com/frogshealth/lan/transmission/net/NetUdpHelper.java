@@ -142,7 +142,9 @@ public class NetUdpHelper implements Runnable {
                     deleteUser(mUdpRecvPacket.getAddress().getHostAddress());
                     break;
                 case Const.MSG_FILE_SEND_REQUEST:
-                    mHandler.sendEmptyMessage(Const.MSG_FILE_SEND_REQUEST);
+                    Message msg = mHandler.obtainMessage(Const.MSG_FILE_SEND_REQUEST);
+                    msg.obj = new LanUser(mUdpRecvPacket.getAddress().getHostAddress(), mUdpRecvPacket.getAddress().getHostAddress());
+                    mHandler.sendMessage(msg);
                     break;
                 case Const.MSG_FILE_RECEIVE:
                     mHandler.sendEmptyMessage(Const.MSG_FILE_RECEIVE);
@@ -316,7 +318,7 @@ public class NetUdpHelper implements Runnable {
                 iterator.remove();
             }
         }
-        LanUser user = new LanUser(name);
+        LanUser user = new LanUser(name, name);
         mUsers.add(user);
         //新用户上线通知
         Message msg = mHandler.obtainMessage(Const.MSG_USER_ONLINE);

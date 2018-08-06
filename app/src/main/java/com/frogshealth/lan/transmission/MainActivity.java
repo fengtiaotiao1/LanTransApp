@@ -8,7 +8,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -16,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.frogshealth.lan.transmission.handler.LanTransAgent;
+import com.frogshealth.lan.transmission.listener.FileOperateListener;
 import com.frogshealth.lan.transmission.listener.UserStateListener;
 import com.frogshealth.lan.transmission.model.LanUser;
 import com.leon.lfilepickerlibrary.LFilePicker;
@@ -32,7 +32,7 @@ import java.util.List;
  * @author yuanjf
  * @创建日期 18/8/1
  ***********************************************************************/
-public class MainActivity extends BaseActivity implements View.OnClickListener, UserStateListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener, UserStateListener, FileOperateListener {
     /**
      * TAG
      */
@@ -61,10 +61,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
      * 搜索的dialog
      */
     private AlertDialog mProgressLoadDialog;
-    /**
-     * 是否同意接受的dialog
-     */
-    private AlertDialog.Builder mReceiveDialog;
     /**
      * 接受文件进度的dialog
      */
@@ -100,7 +96,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         mTvFileInfo = findViewById(R.id.tv_send_file_info);
         ListView mLvDeviceList = findViewById(R.id.lv_device_list);
         mProgressLoadDialog = new AlertDialog.Builder(this, R.style.dialog).create();
-        mReceiveDialog = new AlertDialog.Builder(this);
 
         mAdapter = new LanUserAdapter(mContext, mLanUserList);
         mLvDeviceList.setAdapter(mAdapter);
@@ -164,7 +159,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
      * 发送文件
      */
     private void sendFile() {
-
+        LanTransAgent.getInstance(this).sendFileRequest(mTvDeviceInfo.getText().toString());
     }
 
     /**
@@ -184,28 +179,26 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
      *
      * @param lanUser 设备model
      */
-    private void receiveFile(LanUser lanUser) {
-        mReceiveDialog.show();
-        mReceiveDialog.setCancelable(false);
-        String title = getString(R.string.receive_from) + lanUser.getUserName() + getString(R.string.from_file);
-        mReceiveDialog.setTitle(title)
+    private void receiveFile(final LanUser lanUser) {
+        if (lanUser == null) {
+            return;
+        }
+        AlertDialog.Builder fileReqDialog = new AlertDialog.Builder(this);
+        fileReqDialog.setCancelable(false);
+        fileReqDialog.setTitle(String.format(getString(R.string.receive_from), lanUser.getUserName()))
                 .setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Log.e(TAG, "onClick: " + "start accept file");
-
+                        LanTransAgent.getInstance(MainActivity.this).receiveFile(lanUser.getIp());
                     }
                 })
                 .setNegativeButton(R.string.refuse, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Log.e(TAG, "onClick: " + "refuse accept file");
+                        LanTransAgent.getInstance(MainActivity.this).rejectFile(lanUser.getIp());
                     }
-                });
-    }
-
-    private void startReceiveFile() {
-
+                })
+                .show();
     }
 
     /**
@@ -230,6 +223,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
      */
     private void initListener() {
         LanTransAgent.getInstance(this).registerUserListener(this);
+        LanTransAgent.getInstance(this).registerFileListener(this);
         LanTransAgent.getInstance(this).onlineNotify();
     }
 
@@ -249,6 +243,31 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             @Override
             public void run() {
                 mAdapter.deleteUser(user);
+            }
+        });
+    }
+
+    @Override
+    public void onSendRequest(final LanUser user) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                receiveFile(user);
+            }
+        });
+    }
+
+    @Override
+    public void onReceive() {
+        //发送文件
+    }
+
+    @Override
+    public void onReject() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(MainActivity.this, getString(R.string.reject_file), Toast.LENGTH_SHORT).show();
             }
         });
     }
