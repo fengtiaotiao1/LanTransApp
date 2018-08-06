@@ -18,15 +18,15 @@ public interface FileStatusListener {
     /**
      * 文件上传进度
      * @param schedule 上传进度
-     * @param fileName 文件名称
      * @param fileSize 文件总大小
      */
-    void upload(String fileName, long schedule, long fileSize);
+    void upload(long schedule, long fileSize);
 
     /**
      * 文件上传成功过
+     * @param fileName 文件名称
      */
-    void success();
+    void success(String fileName);
 
     /**
      * 文件上传失败

@@ -6,13 +6,15 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.HandlerThread;
 import android.os.IBinder;
-
 import com.frogshealth.lan.transmission.listener.FileOperateListener;
+import com.frogshealth.lan.transmission.listener.FileStatusListener;
 import com.frogshealth.lan.transmission.listener.UserStateListener;
 import com.frogshealth.lan.transmission.model.LanUser;
 import com.frogshealth.lan.transmission.net.NetUdpHelper;
 import com.frogshealth.lan.transmission.service.LanTransService;
+import com.frogshealth.lan.transmission.utils.Const;
 
+import java.io.File;
 import java.util.List;
 
 /**********************************************************************
@@ -23,7 +25,8 @@ import java.util.List;
  * @author yuanjf
  * @创建日期 18/8/2
  ***********************************************************************/
-public class LanTransAgent {
+public final class LanTransAgent {
+
     /**
      * 单例
      */
@@ -47,7 +50,7 @@ public class LanTransAgent {
 
     /**
      * 获取单例
-     *
+     * @param context Context
      * @return 单例
      */
     public static LanTransAgent getInstance(Context context) {
@@ -60,6 +63,35 @@ public class LanTransAgent {
         }
         return sInstance;
     }
+
+    /**
+     * 发送文件
+     * @param address 地址
+     * @param files 文件列表
+     */
+    public void sendFiles(String address, List<File> files) {
+        TransmissionForSend transmissionForSend = new TransmissionForSend();
+        transmissionForSend.files2FileInfo(files);
+        transmissionForSend.sendFiles(address, Const.DEFAULT_SERVER_PORT);
+    }
+
+    /**
+     * 开启接受文件
+     */
+    public void receiveFiles() {
+        TransmissionForServer server = new TransmissionForServer();
+        server.startServer(new File(Const.PATH));
+    }
+
+    /**
+     * 设置文件传输监听
+     *
+     * @param statusListener 传输监听
+     */
+    public void registerFileStatusListener(FileStatusListener statusListener) {
+        mHandler.registerFileStatusListener(statusListener);
+    }
+
 
     /**
      * 注册监听

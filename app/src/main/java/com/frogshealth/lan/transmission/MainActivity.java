@@ -1,15 +1,12 @@
 package com.frogshealth.lan.transmission;
 
-import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -17,8 +14,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.frogshealth.lan.transmission.handler.LanTransAgent;
-import com.frogshealth.lan.transmission.handler.TransmissionForSend;
-import com.frogshealth.lan.transmission.handler.TransmissionForServer;
 import com.frogshealth.lan.transmission.listener.FileOperateListener;
 import com.frogshealth.lan.transmission.listener.UserStateListener;
 import com.frogshealth.lan.transmission.model.LanUser;
@@ -43,10 +38,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
      * TAG
      */
     private static final String TAG = "MainActivity";
-    /**
-     * 默认文件选择路径
-     */
-    private static final String PATH = Environment.getExternalStorageDirectory().getPath() + "/com.tencent.ma.app/log/";
+
     /**
      * 上下文
      */
@@ -149,7 +141,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 .withActivity(MainActivity.this)
                 .withChooseMode(true)
                 .withNotFoundBooks(getString(R.string.no_select_file))
-                .withStartPath(PATH)
+                .withStartPath(Const.PATH)
                 .start();
     }
 
@@ -200,9 +192,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         LanTransAgent.getInstance(MainActivity.this).receiveFile(lanUser.getIp());
-                        TransmissionForServer server = new TransmissionForServer();
-                        Log.e(TAG, PATH);
-                        server.startServer(new File(PATH));
+                        LanTransAgent.getInstance(MainActivity.this).receiveFiles();
                     }
                 })
                 .setNegativeButton(R.string.refuse, new DialogInterface.OnClickListener() {
@@ -273,13 +263,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     @Override
     public void onReceive() {
         //发送文件
-        TransmissionForSend transmissionForSend = new TransmissionForSend();
         List<File> list = new ArrayList<>();
         for (String mListFile : mListFiles) {
             list.add(new File(mListFile));
         }
-        transmissionForSend.files2FileInfo(list);
-        transmissionForSend.sendFiles(mTvDeviceInfo.getText().toString(), Const.DEFAULT_SERVER_PORT);
+        LanTransAgent.getInstance(MainActivity.this).sendFiles(mTvDeviceInfo.getText().toString(), list);
     }
 
     @Override

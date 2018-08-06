@@ -1,5 +1,7 @@
 package com.frogshealth.lan.transmission.utils;
 
+import android.os.Environment;
+
 /**********************************************************************
  * 常量类。
  *
@@ -70,4 +72,26 @@ public class Const {
      * 文件保存路径
      */
     public static final String SAVE_PATH = "file-save";
+
+    /**
+     * 默认文件选择路径
+     */
+    public static final String PATH = Environment.getExternalStorageDirectory().getPath() + "/com.tencent.ma.app/log/";
+    /**
+     * 文件开始传输
+     */
+    public static final int STARTT_RANSMISSION = 7;
+    /**
+     * 更新进度
+     */
+    public static final int UPLOAD = 8;
+    /**
+     * 传输成功
+     */
+    public static final int SUCCESS = 9;
+    /**
+     * 传输失败
+     */
+    public static final int FAIL = 10;
+
 }

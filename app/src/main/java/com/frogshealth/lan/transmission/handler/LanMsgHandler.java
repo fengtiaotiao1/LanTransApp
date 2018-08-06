@@ -5,6 +5,7 @@ import android.os.HandlerThread;
 import android.os.Message;
 
 import com.frogshealth.lan.transmission.listener.FileOperateListener;
+import com.frogshealth.lan.transmission.listener.FileStatusListener;
 import com.frogshealth.lan.transmission.listener.UserStateListener;
 import com.frogshealth.lan.transmission.model.LanUser;
 import com.frogshealth.lan.transmission.utils.Const;
@@ -29,6 +30,10 @@ public class LanMsgHandler extends Handler {
      * 监听列表
      */
     private final List<UserStateListener> mUserListeners = new ArrayList<>();
+    /**
+     * 文件传输状态监听
+     */
+    private FileStatusListener mFileStatusListener;
 
     public LanMsgHandler(HandlerThread thread) {
         super(thread.getLooper());
@@ -46,10 +51,77 @@ public class LanMsgHandler extends Handler {
             case Const.MSG_USER_OFFLINE:
                 handleUserMsg(msg.what, (LanUser) msg.obj);
                 break;
+            case Const.STARTT_RANSMISSION:
+                startTransmission();
+                break;
+            case Const.UPLOAD:
+                String s = (String) msg.obj;
+                String[] split = s.split(",");
+                upLoading(split[0], split[1]);
+                break;
+            case Const.SUCCESS:
+                String fileName = (String) msg.obj;
+                success(fileName);
+                break;
+            case Const.FAIL:
+                Exception e = (Exception) msg.obj;
+                fileFail(e);
+                break;
             default:
                 break;
         }
     }
+
+    /**
+     * 注册文件传输状态监听
+     * @param statusListener 监听
+     */
+    public void registerFileStatusListener(FileStatusListener statusListener) {
+        this.mFileStatusListener = statusListener;
+    }
+
+    /**
+     * 文件上传中...
+     * @param alreadyReadBytes 已经传输的字节数
+     * @param totalFileSize 文件总长度
+     */
+    private void upLoading(String alreadyReadBytes, String totalFileSize) {
+        if (mFileStatusListener != null) {
+            mFileStatusListener.upload(Long.parseLong(alreadyReadBytes), Long.parseLong(totalFileSize));
+        }
+    }
+
+    /**
+     * 文件传输成功
+     * @param fileName 文件名
+     */
+    private void success(String fileName) {
+        if (mFileStatusListener != null) {
+            mFileStatusListener.success(fileName);
+        }
+
+    }
+
+    /**
+     * 文件传输出现异常
+     * @param e Exception
+     */
+    private void fileFail(Exception e) {
+        if (mFileStatusListener != null) {
+            mFileStatusListener.fail(e);
+        }
+
+    }
+
+    /**
+     * 文件开始传输
+     */
+    private void startTransmission() {
+        if (mFileStatusListener != null) {
+            mFileStatusListener.startTransmission();
+        }
+    }
+
 
     /**
      * 注册监听
@@ -157,4 +229,5 @@ public class LanMsgHandler extends Handler {
             }
         }
     }
+
 }

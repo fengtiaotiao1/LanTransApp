@@ -1,7 +1,6 @@
 package com.frogshealth.lan.transmission.net;
 
 
-import com.frogshealth.lan.transmission.listener.FileStatusListener;
 import com.frogshealth.lan.transmission.model.FileInfo;
 import com.frogshealth.lan.transmission.utils.Const;
 
@@ -43,51 +42,31 @@ public class FileReceiver implements Runnable {
      * File
      */
     private File mFile;
-    /**
-     * 文件传输状态监听
-     */
-    private FileStatusListener mFileStatusListener;
 
     public FileReceiver(Socket mSocket, File file) {
         this.mSocket = mSocket;
         this.mFile = file;
     }
 
-    /**
-     * 设置文件传输监听
-     *
-     * @param statusListener 传输监听
-     */
-    public void setFileStatusListener(FileStatusListener statusListener) {
-        this.mFileStatusListener = statusListener;
-    }
 
 
     @Override
     public void run() {
         try {
-            if (mFileStatusListener != null) {
-                mFileStatusListener.startTransmission();
-            }
+            NetUdpHelper.getInstance().startTransmission();
             init();
         } catch (Exception e) {
-            if (mFileStatusListener != null) {
-                mFileStatusListener.fail(e);
-            }
+            NetUdpHelper.getInstance().fail(e);
         }
         try {
             parseHeader();
         } catch (IOException e) {
-            if (mFileStatusListener != null) {
-                mFileStatusListener.fail(e);
-            }
+            NetUdpHelper.getInstance().fail(e);
         }
         try {
             saveFile();
         } catch (Exception e) {
-            if (mFileStatusListener != null) {
-                mFileStatusListener.fail(e);
-            }
+            NetUdpHelper.getInstance().fail(e);
         }
         finish();
     }
@@ -150,17 +129,19 @@ public class FileReceiver implements Runnable {
         OutputStream bos = new FileOutputStream(savePath);
         byte[] bytes = new byte[Const.BYTE_SIZE_DATA];
         int len = 0;
-        int alreadyReadBytes = 0;
+        long alreadyReadBytes = 0;
+        long sTime = System.currentTimeMillis();
+        long eTime = 0;
         while ((len = mInputStream.read(bytes)) != -1) {
             bos.write(bytes, 0, len);
             alreadyReadBytes += len;
-            if(mFileStatusListener != null) {
-                mFileStatusListener.upload(mFileInfo.getFileName(), alreadyReadBytes, mFileInfo.getFileSize());
+            eTime = System.currentTimeMillis();
+            if(eTime - sTime > 100) {
+                sTime = eTime;
+                NetUdpHelper.getInstance().upload(alreadyReadBytes, mFileInfo.getFileSize());
             }
         }
-        if(mFileStatusListener != null) {
-            mFileStatusListener.success();
-        }
+        NetUdpHelper.getInstance().success(mFileInfo.getFileName());
         bos.close();
     }
 
