@@ -121,6 +121,9 @@ public class FileReceiver implements Runnable {
      * @throws IOException 异常
      */
     private void saveFile() throws IOException {
+        if (!mFile.exists()) {
+            mFile.mkdirs();
+        }
         File savePath = new File(mFile, mFileInfo.getFileName());
         OutputStream bos = new FileOutputStream(savePath);
         byte[] bytes = new byte[Const.BYTE_SIZE_DATA];

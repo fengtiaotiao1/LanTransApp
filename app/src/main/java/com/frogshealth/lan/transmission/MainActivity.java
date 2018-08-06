@@ -1,5 +1,6 @@
 package com.frogshealth.lan.transmission;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -15,12 +17,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.frogshealth.lan.transmission.handler.LanTransAgent;
+import com.frogshealth.lan.transmission.handler.TransmissionForSend;
+import com.frogshealth.lan.transmission.handler.TransmissionForServer;
 import com.frogshealth.lan.transmission.listener.FileOperateListener;
 import com.frogshealth.lan.transmission.listener.UserStateListener;
 import com.frogshealth.lan.transmission.model.LanUser;
+import com.frogshealth.lan.transmission.utils.Const;
 import com.leon.lfilepickerlibrary.LFilePicker;
 import com.leon.lfilepickerlibrary.utils.Constant;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,6 +75,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
      * 用户列表适配
      */
     private LanUserAdapter mAdapter;
+    /**
+     * 用户选中待发送文件集合
+     */
+    private List<String> mListFiles;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,10 +157,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
-            List<String> list = data.getStringArrayListExtra(Constant.RESULT_INFO);
-            if (list != null) {
-                Toast.makeText(getApplicationContext(), String.format(getString(R.string.selected_file_size), list.size()), Toast.LENGTH_SHORT).show();
-                mTvFileInfo.setText(list.get(0));
+            mListFiles = data.getStringArrayListExtra(Constant.RESULT_INFO);
+            if (mListFiles != null) {
+                Toast.makeText(getApplicationContext(), String.format(getString(R.string.selected_file_size), mListFiles.size()), Toast.LENGTH_SHORT).show();
+                mTvFileInfo.setText(mListFiles.get(0));
             }
         }
     }
@@ -190,6 +200,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         LanTransAgent.getInstance(MainActivity.this).receiveFile(lanUser.getIp());
+                        TransmissionForServer server = new TransmissionForServer();
+                        Log.e(TAG, PATH);
+                        server.startServer(new File(PATH));
                     }
                 })
                 .setNegativeButton(R.string.refuse, new DialogInterface.OnClickListener() {
@@ -260,6 +273,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     @Override
     public void onReceive() {
         //发送文件
+        TransmissionForSend transmissionForSend = new TransmissionForSend();
+        List<File> list = new ArrayList<>();
+        for (String mListFile : mListFiles) {
+            list.add(new File(mListFile));
+        }
+        transmissionForSend.files2FileInfo(list);
+        transmissionForSend.sendFiles(mTvDeviceInfo.getText().toString(), Const.DEFAULT_SERVER_PORT);
     }
 
     @Override
