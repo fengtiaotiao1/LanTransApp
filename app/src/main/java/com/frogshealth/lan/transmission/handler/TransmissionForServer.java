@@ -58,22 +58,18 @@ public class TransmissionForServer {
 
                         @Override
                         public void startTransmission() {
-                            System.out.println("XXX startTransmission");
                         }
 
                         @Override
                         public void upload(String fileName, long schedule, long fileSize) {
-//                            System.out.println("XXX fileName = " + fileName + ", schedule = " + schedule + ", fileSize = " + fileSize);
                         }
 
                         @Override
                         public void success() {
-                            System.out.println("XXX success");
                         }
 
                         @Override
                         public void fail(Exception e) {
-                            System.out.println("XXX fail");
                         }
                     });
                     LanApplication.MAINEXECUTOR.execute(fileReceiver);
