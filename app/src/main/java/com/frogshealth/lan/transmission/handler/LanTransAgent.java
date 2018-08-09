@@ -10,6 +10,7 @@ import com.frogshealth.lan.transmission.listener.FileOperateListener;
 import com.frogshealth.lan.transmission.listener.FileStatusListener;
 import com.frogshealth.lan.transmission.listener.UserStateListener;
 import com.frogshealth.lan.transmission.model.LanUser;
+import com.frogshealth.lan.transmission.net.NetTcpHelper;
 import com.frogshealth.lan.transmission.net.NetUdpHelper;
 import com.frogshealth.lan.transmission.service.LanTransService;
 import com.frogshealth.lan.transmission.utils.Const;
@@ -84,14 +85,21 @@ public final class LanTransAgent {
     }
 
     /**
-     * 设置文件传输监听
+     * 设置文件接收监听
      *
      * @param statusListener 传输监听
      */
-    public void registerFileStatusListener(FileStatusListener statusListener) {
-        mHandler.registerFileStatusListener(statusListener);
+    public void registerFileReceiveListener(FileStatusListener statusListener) {
+        mHandler.registerFileReceiveListener(statusListener);
     }
 
+    /**
+     * 设置文件发送监听
+     * @param statusListener 传输监听
+     */
+    public void registerFileSendListener(FileStatusListener statusListener) {
+        mHandler.registerFileSendListener(statusListener);
+    }
 
     /**
      * 注册监听
@@ -192,6 +200,7 @@ public final class LanTransAgent {
         mThread.start();
         mHandler = new LanMsgHandler(mThread);
         NetUdpHelper.getInstance().init(mHandler);
+        NetTcpHelper.getInstance().init(mHandler);
     }
 
     /**

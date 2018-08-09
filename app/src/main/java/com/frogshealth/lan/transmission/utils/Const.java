@@ -78,20 +78,35 @@ public class Const {
      */
     public static final String PATH = Environment.getExternalStorageDirectory().getPath() + "/com.tencent.ma.app/log/";
     /**
-     * 文件开始传输
+     * 文件开始传输(接收)
      */
-    public static final int STARTT_RANSMISSION = 7;
+    public static final int STARTT_FOR_RECEIVE = 7;
     /**
-     * 更新进度
+     * 更新进度(接收)
      */
-    public static final int UPLOAD = 8;
+    public static final int UPLOAD_FOR_RECEIVE = 8;
     /**
-     * 传输成功
+     * 传输成功(接收)
      */
-    public static final int SUCCESS = 9;
+    public static final int SUCCESS_FOR_RECEIVE = 9;
     /**
-     * 传输失败
+     * 传输失败(接收)
      */
-    public static final int FAIL = 10;
-
+    public static final int FAIL_FOR_RECEIVE = 10;
+    /**
+     * 文件开始传输(发送)
+     */
+    public static final int STARTT_FOR_SEND = 11;
+    /**
+     * 更新进度(发送)
+     */
+    public static final int UPLOAD_FOR_SEND = 12;
+    /**
+     * 传输成功(发送)
+     */
+    public static final int SUCCESS_FOR_SEND = 13;
+    /**
+     * 传输失败(发送)
+     */
+    public static final int FAIL_FOR_SEND = 14;
 }

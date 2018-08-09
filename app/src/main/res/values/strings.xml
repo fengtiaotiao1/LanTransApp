@@ -9,4 +9,6 @@
     <string name="selected_file_size">选择了%d个文件</string>
     <string name="no_select_file">请选择导入的文件</string>
     <string name="reject_file">对方拒绝了你的文件</string>
+    <string name="receive_success">接收成功</string>
+    <string name="send_success">发送成功</string>
 </resources>

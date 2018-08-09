@@ -33,7 +33,11 @@ public class LanMsgHandler extends Handler {
     /**
      * 文件传输状态监听
      */
-    private FileStatusListener mFileStatusListener;
+    private FileStatusListener mFileReceiveListener;
+    /**
+     * 文件传输状态监听
+     */
+    private FileStatusListener mFileSendListener;
 
     public LanMsgHandler(HandlerThread thread) {
         super(thread.getLooper());
@@ -51,21 +55,37 @@ public class LanMsgHandler extends Handler {
             case Const.MSG_USER_OFFLINE:
                 handleUserMsg(msg.what, (LanUser) msg.obj);
                 break;
-            case Const.STARTT_RANSMISSION:
-                startTransmission();
+            case Const.STARTT_FOR_RECEIVE:
+                startForReceive();
                 break;
-            case Const.UPLOAD:
-                String s = (String) msg.obj;
-                String[] split = s.split(",");
-                upLoading(split[0], split[1]);
+            case Const.UPLOAD_FOR_RECEIVE:
+                String receiveString = (String) msg.obj;
+                String[] receive = receiveString.split(",");
+                upLoadingForReceive(receive[0], receive[1], receive[2]);
                 break;
-            case Const.SUCCESS:
-                String fileName = (String) msg.obj;
-                success(fileName);
+            case Const.SUCCESS_FOR_RECEIVE:
+                String receiveFleName = (String) msg.obj;
+                successForReceive(receiveFleName);
                 break;
-            case Const.FAIL:
-                Exception e = (Exception) msg.obj;
-                fileFail(e);
+            case Const.FAIL_FOR_RECEIVE:
+                Exception receiveException = (Exception) msg.obj;
+                fileFailForReceive(receiveException);
+                break;
+            case Const.STARTT_FOR_SEND:
+                startForSend();
+                break;
+            case Const.UPLOAD_FOR_SEND:
+                String sendString = (String) msg.obj;
+                String[] send = sendString.split(",");
+                upLoadingForSend(send[0], send[1], send[2]);
+                break;
+            case Const.SUCCESS_FOR_SEND:
+                String sendFileName = (String) msg.obj;
+                successForSend(sendFileName);
+                break;
+            case Const.FAIL_FOR_SEND:
+                Exception sendException = (Exception) msg.obj;
+                fileFailForSend(sendException);
                 break;
             default:
                 break;
@@ -73,21 +93,71 @@ public class LanMsgHandler extends Handler {
     }
 
     /**
-     * 注册文件传输状态监听
+     * 文件发送失败
+     * @param sendException Exception
+     */
+    private void fileFailForSend(Exception sendException) {
+        if (mFileSendListener != null) {
+            mFileSendListener.fail(sendException);
+        }
+    }
+
+    /**
+     * 文件发送成功
+     * @param sendFileName 文件名称
+     */
+    private void successForSend(String sendFileName) {
+        if (mFileSendListener != null) {
+            mFileSendListener.success(sendFileName);
+        }
+    }
+
+    /**
+     * 发送文件中
+     * @param name 文件名称
+     * @param current 当前进度
+     * @param total 总文件长度
+     */
+    private void upLoadingForSend(String name, String current, String total) {
+        if (mFileSendListener != null) {
+            mFileSendListener.upload(name, Long.parseLong(current), Long.parseLong(total));
+        }
+    }
+
+    /**
+     * 开始发送
+     */
+    private void startForSend() {
+        if (mFileSendListener != null) {
+            mFileSendListener.startTransmission();
+        }
+    }
+
+    /**
+     * 注册文件接收状态监听
      * @param statusListener 监听
      */
-    public void registerFileStatusListener(FileStatusListener statusListener) {
-        this.mFileStatusListener = statusListener;
+    public void registerFileReceiveListener(FileStatusListener statusListener) {
+        this.mFileReceiveListener = statusListener;
+    }
+
+    /**
+     * 注册文件发送状态接听
+     * @param statusListener 监听
+     */
+    public void registerFileSendListener(FileStatusListener statusListener) {
+        this.mFileSendListener = statusListener;
     }
 
     /**
      * 文件上传中...
+     * @param name 文件名称
      * @param alreadyReadBytes 已经传输的字节数
      * @param totalFileSize 文件总长度
      */
-    private void upLoading(String alreadyReadBytes, String totalFileSize) {
-        if (mFileStatusListener != null) {
-            mFileStatusListener.upload(Long.parseLong(alreadyReadBytes), Long.parseLong(totalFileSize));
+    private void upLoadingForReceive(String name, String alreadyReadBytes, String totalFileSize) {
+        if (mFileReceiveListener != null) {
+            mFileReceiveListener.upload(name, Long.parseLong(alreadyReadBytes), Long.parseLong(totalFileSize));
         }
     }
 
@@ -95,9 +165,9 @@ public class LanMsgHandler extends Handler {
      * 文件传输成功
      * @param fileName 文件名
      */
-    private void success(String fileName) {
-        if (mFileStatusListener != null) {
-            mFileStatusListener.success(fileName);
+    private void successForReceive(String fileName) {
+        if (mFileReceiveListener != null) {
+            mFileReceiveListener.success(fileName);
         }
 
     }
@@ -106,9 +176,9 @@ public class LanMsgHandler extends Handler {
      * 文件传输出现异常
      * @param e Exception
      */
-    private void fileFail(Exception e) {
-        if (mFileStatusListener != null) {
-            mFileStatusListener.fail(e);
+    private void fileFailForReceive(Exception e) {
+        if (mFileReceiveListener != null) {
+            mFileReceiveListener.fail(e);
         }
 
     }
@@ -116,9 +186,9 @@ public class LanMsgHandler extends Handler {
     /**
      * 文件开始传输
      */
-    private void startTransmission() {
-        if (mFileStatusListener != null) {
-            mFileStatusListener.startTransmission();
+    private void startForReceive() {
+        if (mFileReceiveListener != null) {
+            mFileReceiveListener.startTransmission();
         }
     }
 
@@ -229,5 +299,6 @@ public class LanMsgHandler extends Handler {
             }
         }
     }
+
 
 }

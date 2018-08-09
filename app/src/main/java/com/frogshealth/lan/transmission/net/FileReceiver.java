@@ -53,20 +53,20 @@ public class FileReceiver implements Runnable {
     @Override
     public void run() {
         try {
-            NetUdpHelper.getInstance().startTransmission();
+            NetTcpHelper.getInstance().startForReceive();
             init();
         } catch (Exception e) {
-            NetUdpHelper.getInstance().fail(e);
+            NetTcpHelper.getInstance().failForReceive(e);
         }
         try {
             parseHeader();
         } catch (IOException e) {
-            NetUdpHelper.getInstance().fail(e);
+            NetTcpHelper.getInstance().failForReceive(e);
         }
         try {
             saveFile();
         } catch (Exception e) {
-            NetUdpHelper.getInstance().fail(e);
+            NetTcpHelper.getInstance().failForReceive(e);
         }
         finish();
     }
@@ -138,10 +138,10 @@ public class FileReceiver implements Runnable {
             eTime = System.currentTimeMillis();
             if(eTime - sTime > 100) {
                 sTime = eTime;
-                NetUdpHelper.getInstance().upload(alreadyReadBytes, mFileInfo.getFileSize());
+                NetTcpHelper.getInstance().uploadForReceive(mFileInfo.getFileName(), alreadyReadBytes, mFileInfo.getFileSize());
             }
         }
-        NetUdpHelper.getInstance().success(mFileInfo.getFileName());
+        NetTcpHelper.getInstance().successForReceive(mFileInfo.getFileName());
         bos.close();
     }
 

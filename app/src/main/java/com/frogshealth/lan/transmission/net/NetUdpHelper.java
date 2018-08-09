@@ -29,7 +29,7 @@ import java.util.concurrent.Executors;
  * @author yuanjf
  * @创建日期 18/8/1
  ***********************************************************************/
-public class NetUdpHelper implements Runnable {
+public final class NetUdpHelper implements Runnable {
     /**
      * 日志标识
      */
@@ -247,6 +247,7 @@ public class NetUdpHelper implements Runnable {
 
     /**
      * 初始化
+     * @param handler Handler
      */
     public void init(Handler handler) {
         try {
@@ -351,42 +352,5 @@ public class NetUdpHelper implements Runnable {
         }
     }
 
-    /**
-     * 文件开始传输
-     */
-    public void startTransmission() {
-        Message msg = mHandler.obtainMessage(Const.STARTT_RANSMISSION);
-        mHandler.sendMessage(msg);
-    }
 
-    /**
-     * 文件传输出现异常
-     * @param e Exception
-     */
-    public void fail(Exception e) {
-        Message msg = mHandler.obtainMessage(Const.FAIL);
-        msg.obj = e;
-        mHandler.sendMessage(msg);
-    }
-
-    /**
-     * 文件上传进度
-     * @param alreadyReadBytes 已经上传字节数
-     * @param fileSize 文件总大小
-     */
-    public void upload(long alreadyReadBytes, long fileSize) {
-        Message msg = mHandler.obtainMessage(Const.UPLOAD);
-        msg.obj = alreadyReadBytes + "," + fileSize;
-        mHandler.sendMessage(msg);
-    }
-
-    /**
-     * 文件传输成功回调
-     * @param fileName 文件名称
-     */
-    public void success(String fileName) {
-        Message msg = mHandler.obtainMessage(Const.SUCCESS);
-        msg.obj = fileName;
-        mHandler.sendMessage(msg);
-    }
 }

@@ -59,21 +59,22 @@ public class FileSender implements Runnable {
     @Override
     public void run() {
         try {
+            NetTcpHelper.getInstance().startForSend();
             initSocket();
         } catch (Exception e) {
-            e.printStackTrace();
+            NetTcpHelper.getInstance().failForSend(e);
         }
         try {
             writeFileInfo();
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            NetTcpHelper.getInstance().failForSend(e);
         } catch (IOException e) {
-            e.printStackTrace();
+            NetTcpHelper.getInstance().failForSend(e);
         }
         try {
             sendFile();
         } catch (Exception e) {
-            e.printStackTrace();
+            NetTcpHelper.getInstance().failForSend(e);
         }
 
         finish();
@@ -101,9 +102,6 @@ public class FileSender implements Runnable {
      * 结束
      */
     private void finish() {
-//        closeSocketInput(mSocket);
-//        closeSocketOutput(mSocket);
-//        closeSocket(mSocket);
         if (mOutputStream != null) {
             try {
                 mOutputStream.close();
@@ -124,17 +122,26 @@ public class FileSender implements Runnable {
 
     /**
      * 发送文件
-     *
      * @throws Exception 异常
      */
     private void sendFile() throws Exception {
         InputStream fis = new FileInputStream(mFile.getPath());
         byte[] bytes = new byte[Const.BYTE_SIZE_DATA];
         int len = 0;
+        long sTime = System.currentTimeMillis();
+        long alreadyReadBytes = 0;
+        long eTime = 0;
         while ((len = fis.read(bytes)) != -1) {
+            alreadyReadBytes += len;
+            eTime = System.currentTimeMillis();
             mOutputStream.write(bytes, 0, len);
+            if(eTime - sTime > 100) {
+                sTime = eTime;
+                NetTcpHelper.getInstance().uploadForSend(mFile.getFileName(), alreadyReadBytes, mFile.getFileSize());
+            }
         }
         mOutputStream.flush();
+        NetTcpHelper.getInstance().successForSend(mFile.getFileName());
     }
 
     /**
