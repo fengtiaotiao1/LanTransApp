@@ -109,4 +109,8 @@ public class Const {
      * 传输失败(发送)
      */
     public static final int FAIL_FOR_SEND = 14;
+    /**
+     * 权限Code
+     */
+    public static final int PERMISSION = 15;
 }

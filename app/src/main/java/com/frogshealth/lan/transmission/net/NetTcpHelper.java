@@ -118,4 +118,12 @@ public class NetTcpHelper {
         msg.obj = e;
         mHandler.sendMessage(msg);
     }
+
+    public void release() {
+        if (mHandler != null) {
+            mHandler.removeCallbacksAndMessages(null);
+            mHandler = null;
+        }
+        sInstance = null;
+    }
 }

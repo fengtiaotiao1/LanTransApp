@@ -1,11 +1,16 @@
 package com.frogshealth.lan.transmission;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.AdapterView;
@@ -98,6 +103,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
      * 接收的ProgressBar
      */
     private ProgressBar mReceivePb;
+    /**
+     * 权限组
+     */
+    private String[] mPermissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
+    /**
+     * LanUser
+     */
+    private LanUser mlanUser;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +126,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     protected void onDestroy() {
         super.onDestroy();
         LanTransAgent.getInstance(this).release();
+        
     }
 
     /**
@@ -147,6 +162,32 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         });
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        int flag = -1;
+        switch (requestCode) {
+            case Const.PERMISSION: {
+                if (grantResults.length > 0) {
+                    for (int i = 0; i < grantResults.length; i++) {
+                        if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                            flag = 0;
+                        } else {
+                            flag = -1;
+                            break;
+                        }
+                    }
+                }
+                if (flag == 0) {
+                    LanTransAgent.getInstance(MainActivity.this).receiveFile(mlanUser.getIp());
+                    LanTransAgent.getInstance(MainActivity.this).receiveFiles();
+                } else {
+                    Toast.makeText(MainActivity.this, MainActivity.this.getString(R.string.allow), Toast.LENGTH_LONG).show();
+                    LanTransAgent.getInstance(MainActivity.this).rejectFile(mlanUser.getIp());
+                }
+
+            }
+        }
+    }
 
     /**
      * 设置接收监听
@@ -335,14 +376,31 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         if (lanUser == null) {
             return;
         }
+        this.mlanUser = lanUser;
         AlertDialog.Builder fileReqDialog = new AlertDialog.Builder(this);
         fileReqDialog.setCancelable(false);
         fileReqDialog.setTitle(String.format(getString(R.string.receive_from), lanUser.getUserName()))
                 .setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        LanTransAgent.getInstance(MainActivity.this).receiveFile(lanUser.getIp());
-                        LanTransAgent.getInstance(MainActivity.this).receiveFiles();
+                        boolean allPermissions = false;
+                        for (int i = 0; i < mPermissions.length; i++) {
+                            if (ContextCompat.checkSelfPermission(MainActivity.this, mPermissions[i]) == PackageManager.PERMISSION_GRANTED) {
+                                allPermissions = true;
+                            } else {
+                                allPermissions = false;
+                                break;
+                            }
+                        }
+                        if (allPermissions == false) {
+                            //应该请求授权
+                            ActivityCompat.requestPermissions(MainActivity.this, mPermissions, Const.PERMISSION);
+                        }else {
+                            LanTransAgent.getInstance(MainActivity.this).receiveFile(mlanUser.getIp());
+                            LanTransAgent.getInstance(MainActivity.this).receiveFiles();
+                        }
+                        System.out.println("XXX  1111");
+
                     }
                 })
                 .setNegativeButton(R.string.refuse, new DialogInterface.OnClickListener() {

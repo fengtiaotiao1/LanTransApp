@@ -95,9 +95,10 @@ public final class LanTransAgent {
 
     /**
      * 设置文件发送监听
-     * @param statusListener 传输监听
+     * @param statusListener
      */
     public void registerFileSendListener(FileStatusListener statusListener) {
+        System.out.println("XXX " + mHandler);
         mHandler.registerFileSendListener(statusListener);
     }
 
@@ -215,8 +216,15 @@ public final class LanTransAgent {
             mThread.quit();
             mThread = null;
         }
+
         NetUdpHelper.getInstance().release();
+        NetTcpHelper.getInstance().release();
+        sInstance = null;
+        mContext = null;
+        System.exit(0);
     }
+
+
 
     /**
      * 上线通知

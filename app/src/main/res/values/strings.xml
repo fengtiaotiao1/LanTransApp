@@ -11,4 +11,5 @@
     <string name="reject_file">对方拒绝了你的文件</string>
     <string name="receive_success">接收成功</string>
     <string name="send_success">发送成功</string>
+    <string name="allow">必须同意权限才可进入</string>
 </resources>

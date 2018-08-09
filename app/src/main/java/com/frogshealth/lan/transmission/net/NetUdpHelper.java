@@ -275,6 +275,11 @@ public final class NetUdpHelper implements Runnable {
             mUdpThread.interrupt();
             mUdpThread = null;
         }
+        if (mHandler != null) {
+            mHandler.removeCallbacksAndMessages(null);
+            mHandler = null;
+        }
+        sInstance = null;
     }
 
     /**

@@ -40,6 +40,7 @@ public class LanApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        //TODO 这个this是整个进程的，APP退出，进程没有杀死，会导致Handler为null。
         LanTransAgent.getInstance(this).init();
     }
 
@@ -97,4 +98,5 @@ public class LanApplication extends Application {
         }
         return appCacheDir;
     }
+
 }
