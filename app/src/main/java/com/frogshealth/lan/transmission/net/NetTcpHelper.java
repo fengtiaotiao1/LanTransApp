@@ -62,7 +62,7 @@ public class NetTcpHelper {
         mHandler.sendMessage(msg);
     }
     /**
-     * 文件上传进度
+     * 文件接收进度
      * @param name 文件名称
      * @param alreadyReadBytes 已经上传字节数
      * @param fileSize 文件总大小
