@@ -14,6 +14,7 @@ import com.frogshealth.lan.transmission.net.NetTcpHelper;
 import com.frogshealth.lan.transmission.net.NetUdpHelper;
 import com.frogshealth.lan.transmission.service.LanTransService;
 import com.frogshealth.lan.transmission.utils.Const;
+import com.frogshealth.lan.transmission.utils.FileUtils;
 
 import java.io.File;
 import java.util.List;
@@ -81,7 +82,7 @@ public final class LanTransAgent {
      */
     public void receiveFiles() {
         TransmissionForServer server = new TransmissionForServer();
-        server.startServer(new File(Const.PATH));
+        server.startServer(FileUtils.getFileSavePath(mContext));
     }
 
     /**

@@ -48,7 +48,6 @@ public class FileReceiver implements Runnable {
         this.mFile = file;
     }
 
-
     @Override
     public void run() {
         try {
@@ -88,7 +87,7 @@ public class FileReceiver implements Runnable {
             }
         }
         String jsonStr = new String(headerBytes, "UTF-8");
-        String[] strArray = jsonStr.split(Const.SPERATOR);
+        String[] strArray = jsonStr.split(Const.SEPARATOR);
         jsonStr = strArray[1].trim();
         mFileInfo = FileInfo.toObject(jsonStr);
     }
