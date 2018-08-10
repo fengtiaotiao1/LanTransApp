@@ -49,24 +49,23 @@ public class FileReceiver implements Runnable {
     }
 
 
-
     @Override
     public void run() {
         try {
-            NetTcpHelper.getInstance().startForReceive();
+            NetTcpHelper.getInstance().startTransmission(Const.RECEIVE);
             init();
         } catch (Exception e) {
-            NetTcpHelper.getInstance().failForReceive(e);
+            NetTcpHelper.getInstance().failForReceiveOrSend(e, Const.RECEIVE);
         }
         try {
             parseHeader();
         } catch (IOException e) {
-            NetTcpHelper.getInstance().failForReceive(e);
+            NetTcpHelper.getInstance().failForReceiveOrSend(e, Const.RECEIVE);
         }
         try {
             saveFile();
         } catch (Exception e) {
-            NetTcpHelper.getInstance().failForReceive(e);
+            NetTcpHelper.getInstance().failForReceiveOrSend(e, Const.RECEIVE);
         }
         finish();
     }
@@ -115,7 +114,6 @@ public class FileReceiver implements Runnable {
         }
     }
 
-
     /**
      * 保存文件
      *
@@ -136,12 +134,12 @@ public class FileReceiver implements Runnable {
             bos.write(bytes, 0, len);
             alreadyReadBytes += len;
             eTime = System.currentTimeMillis();
-            if(eTime - sTime > 100) {
+            if (eTime - sTime > 100) {
                 sTime = eTime;
-                NetTcpHelper.getInstance().uploadForReceive(mFileInfo.getFileName(), alreadyReadBytes, mFileInfo.getFileSize());
+                NetTcpHelper.getInstance().upLoading(Const.RECEIVE, mFileInfo.getFileName(), alreadyReadBytes, mFileInfo.getFileSize());
             }
         }
-        NetTcpHelper.getInstance().successForReceive(mFileInfo.getFileName());
+        NetTcpHelper.getInstance().successForReceiveOrSend(mFileInfo.getFileName(), Const.RECEIVE);
         bos.close();
     }
 

@@ -59,22 +59,22 @@ public class FileSender implements Runnable {
     @Override
     public void run() {
         try {
-            NetTcpHelper.getInstance().startForSend();
+            NetTcpHelper.getInstance().startTransmission(Const.SEND);
             initSocket();
         } catch (Exception e) {
-            NetTcpHelper.getInstance().failForSend(e);
+            NetTcpHelper.getInstance().failForReceiveOrSend(e, Const.SEND);
         }
         try {
             writeFileInfo();
         } catch (UnsupportedEncodingException e) {
-            NetTcpHelper.getInstance().failForSend(e);
+            NetTcpHelper.getInstance().failForReceiveOrSend(e, Const.SEND);
         } catch (IOException e) {
-            NetTcpHelper.getInstance().failForSend(e);
+            NetTcpHelper.getInstance().failForReceiveOrSend(e, Const.SEND);
         }
         try {
             sendFile();
         } catch (Exception e) {
-            NetTcpHelper.getInstance().failForSend(e);
+            NetTcpHelper.getInstance().failForReceiveOrSend(e, Const.SEND);
         }
 
         finish();
@@ -122,6 +122,7 @@ public class FileSender implements Runnable {
 
     /**
      * 发送文件
+     *
      * @throws Exception 异常
      */
     private void sendFile() throws Exception {
@@ -135,13 +136,13 @@ public class FileSender implements Runnable {
             alreadyReadBytes += len;
             eTime = System.currentTimeMillis();
             mOutputStream.write(bytes, 0, len);
-            if(eTime - sTime > 100) {
+            if (eTime - sTime > 100) {
                 sTime = eTime;
-                NetTcpHelper.getInstance().uploadForSend(mFile.getFileName(), alreadyReadBytes, mFile.getFileSize());
+                NetTcpHelper.getInstance().upLoading(Const.SEND, mFile.getFileName(), alreadyReadBytes, mFile.getFileSize());
             }
         }
         mOutputStream.flush();
-        NetTcpHelper.getInstance().successForSend(mFile.getFileName());
+        NetTcpHelper.getInstance().successForReceiveOrSend(mFile.getFileName(), Const.SEND);
     }
 
     /**

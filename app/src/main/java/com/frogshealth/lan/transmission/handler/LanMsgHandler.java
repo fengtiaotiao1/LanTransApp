@@ -55,37 +55,19 @@ public class LanMsgHandler extends Handler {
             case Const.MSG_USER_OFFLINE:
                 handleUserMsg(msg.what, (LanUser) msg.obj);
                 break;
-            case Const.STARTT_FOR_RECEIVE:
-                startForReceive();
+            case Const.IS_SEND_OR_RECEIVE_START:
+                receiveOrSend_Start(msg.arg1);
                 break;
-            case Const.UPLOAD_FOR_RECEIVE:
-                String receiveString = (String) msg.obj;
-                String[] receive = receiveString.split(",");
-                upLoadingForReceive(receive[0], receive[1], receive[2]);
+            case Const.IS_SEND_OR_RECEIVE_FAIL:
+                receiveOrSend_Fail(msg.arg1, (Exception) msg.obj);
                 break;
-            case Const.SUCCESS_FOR_RECEIVE:
-                String receiveFleName = (String) msg.obj;
-                successForReceive(receiveFleName);
+            case Const.IS_SEND_OR_RECEIVE_SUCCESS:
+                receiveOrSend_Success(msg.arg1, (String) msg.obj);
                 break;
-            case Const.FAIL_FOR_RECEIVE:
-                Exception receiveException = (Exception) msg.obj;
-                fileFailForReceive(receiveException);
-                break;
-            case Const.STARTT_FOR_SEND:
-                startForSend();
-                break;
-            case Const.UPLOAD_FOR_SEND:
+            case Const.IS_SEND_OR_RECEIVE_UPLOAD:
                 String sendString = (String) msg.obj;
-                String[] send = sendString.split(",");
-                upLoadingForSend(send[0], send[1], send[2]);
-                break;
-            case Const.SUCCESS_FOR_SEND:
-                String sendFileName = (String) msg.obj;
-                successForSend(sendFileName);
-                break;
-            case Const.FAIL_FOR_SEND:
-                Exception sendException = (Exception) msg.obj;
-                fileFailForSend(sendException);
+                String[] parameter = sendString.split(",");
+                receiveOrSend_UpLoading(msg.arg1, parameter[0], parameter[1], parameter[2]);
                 break;
             default:
                 break;
@@ -93,48 +75,81 @@ public class LanMsgHandler extends Handler {
     }
 
     /**
-     * 文件发送失败
-     * @param sendException Exception
+     * 文件上传中...
+     *
+     * @param flag    发送或者接收
+     * @param name    文件名称
+     * @param current 已经传输的字节数
+     * @param total   文件总长度
      */
-    private void fileFailForSend(Exception sendException) {
-        if (mFileSendListener != null) {
-            mFileSendListener.fail(sendException);
+    private void receiveOrSend_UpLoading(int flag, String name, String current, String total) {
+        if (Const.SEND == flag) {
+            if (mFileSendListener != null) {
+                mFileSendListener.upload(flag, name, Long.parseLong(current), Long.parseLong(total));
+            }
+        } else if (Const.RECEIVE == flag) {
+            if (mFileReceiveListener != null) {
+                mFileReceiveListener.upload(flag, name, Long.parseLong(current), Long.parseLong(total));
+            }
         }
     }
 
     /**
      * 文件发送成功
-     * @param sendFileName 文件名称
+     *
+     * @param flag     发送或者接收
+     * @param fileName 文件名称
      */
-    private void successForSend(String sendFileName) {
-        if (mFileSendListener != null) {
-            mFileSendListener.success(sendFileName);
+    private void receiveOrSend_Success(int flag, String fileName) {
+        if (Const.SEND == flag) {
+            if (mFileSendListener != null) {
+                mFileSendListener.success(flag, fileName);
+            }
+        } else if (Const.RECEIVE == flag) {
+            if (mFileReceiveListener != null) {
+                mFileReceiveListener.success(flag, fileName);
+            }
         }
     }
 
     /**
-     * 发送文件中
-     * @param name 文件名称
-     * @param current 当前进度
-     * @param total 总文件长度
+     * 文件传输出现异常
+     *
+     * @param flag 发送或者接收
+     * @param e    Exception
      */
-    private void upLoadingForSend(String name, String current, String total) {
-        if (mFileSendListener != null) {
-            mFileSendListener.upload(name, Long.parseLong(current), Long.parseLong(total));
+    private void receiveOrSend_Fail(int flag, Exception e) {
+        if (Const.SEND == flag) {
+            if (mFileSendListener != null) {
+                mFileSendListener.fail(flag, e);
+            }
+        } else if (Const.RECEIVE == flag) {
+            if (mFileReceiveListener != null) {
+                mFileReceiveListener.fail(flag, e);
+            }
         }
     }
 
     /**
-     * 开始发送
+     * 开始发送或者开始接收
+     *
+     * @param flag 发送或者接收
      */
-    private void startForSend() {
-        if (mFileSendListener != null) {
-            mFileSendListener.startTransmission();
+    private void receiveOrSend_Start(int flag) {
+        if (Const.SEND == flag) {
+            if (mFileSendListener != null) {
+                mFileSendListener.startTransmission(flag);
+            }
+        } else if (Const.RECEIVE == flag) {
+            if (mFileReceiveListener != null) {
+                mFileReceiveListener.startTransmission(flag);
+            }
         }
     }
 
     /**
      * 注册文件接收状态监听
+     *
      * @param statusListener 监听
      */
     public void registerFileReceiveListener(FileStatusListener statusListener) {
@@ -143,55 +158,12 @@ public class LanMsgHandler extends Handler {
 
     /**
      * 注册文件发送状态接听
+     *
      * @param statusListener 监听
      */
     public void registerFileSendListener(FileStatusListener statusListener) {
         this.mFileSendListener = statusListener;
     }
-
-    /**
-     * 文件上传中...
-     * @param name 文件名称
-     * @param alreadyReadBytes 已经传输的字节数
-     * @param totalFileSize 文件总长度
-     */
-    private void upLoadingForReceive(String name, String alreadyReadBytes, String totalFileSize) {
-        if (mFileReceiveListener != null) {
-            mFileReceiveListener.upload(name, Long.parseLong(alreadyReadBytes), Long.parseLong(totalFileSize));
-        }
-    }
-
-    /**
-     * 文件传输成功
-     * @param fileName 文件名
-     */
-    private void successForReceive(String fileName) {
-        if (mFileReceiveListener != null) {
-            mFileReceiveListener.success(fileName);
-        }
-
-    }
-
-    /**
-     * 文件传输出现异常
-     * @param e Exception
-     */
-    private void fileFailForReceive(Exception e) {
-        if (mFileReceiveListener != null) {
-            mFileReceiveListener.fail(e);
-        }
-
-    }
-
-    /**
-     * 文件开始传输
-     */
-    private void startForReceive() {
-        if (mFileReceiveListener != null) {
-            mFileReceiveListener.startTransmission();
-        }
-    }
-
 
     /**
      * 注册监听

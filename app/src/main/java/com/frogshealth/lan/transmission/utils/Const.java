@@ -44,6 +44,38 @@ public class Const {
      */
     public static final int MSG_FILE_SEND_REQUEST = 6;
     /**
+     * 是发送
+     */
+    public static final int SEND = 7;
+    /**
+     * 是接收
+     */
+    public static final int RECEIVE = 8;
+    /**
+     * 开始  发送或者接收
+     */
+    public static final int IS_SEND_OR_RECEIVE_START = 9;
+    /**
+     * 失败  发送或者接收
+     */
+    public static final int IS_SEND_OR_RECEIVE_FAIL = 10;
+    /**
+     * 成功  发送或者接收
+     */
+    public static final int IS_SEND_OR_RECEIVE_SUCCESS = 11;
+    /**
+     * 传输中  发送或者接收
+     */
+    public static final int IS_SEND_OR_RECEIVE_UPLOAD = 12;
+    /**
+     * 传输文件类型
+     */
+    public static final int TYPE_FILE = 13; //文件类型
+    /**
+     * 权限Code
+     */
+    public static final int PERMISSION = 15;
+    /**
      * UTF-8
      */
     public static final String UTF8 = "UTF-8";
@@ -58,10 +90,6 @@ public class Const {
      */
     public static final int BYTE_SIZE_DATA = 1024 * 4;
 
-    /**
-     * 传输文件类型
-     */
-    public static final int TYPE_FILE = 1; //文件类型
 
     /**
      * 文件传输监听 默认端口
@@ -77,40 +105,6 @@ public class Const {
      * 默认文件选择路径
      */
     public static final String PATH = Environment.getExternalStorageDirectory().getPath() + "/com.tencent.ma.app/log/";
-    /**
-     * 文件开始传输(接收)
-     */
-    public static final int STARTT_FOR_RECEIVE = 7;
-    /**
-     * 更新进度(接收)
-     */
-    public static final int UPLOAD_FOR_RECEIVE = 8;
-    /**
-     * 传输成功(接收)
-     */
-    public static final int SUCCESS_FOR_RECEIVE = 9;
-    /**
-     * 传输失败(接收)
-     */
-    public static final int FAIL_FOR_RECEIVE = 10;
-    /**
-     * 文件开始传输(发送)
-     */
-    public static final int STARTT_FOR_SEND = 11;
-    /**
-     * 更新进度(发送)
-     */
-    public static final int UPLOAD_FOR_SEND = 12;
-    /**
-     * 传输成功(发送)
-     */
-    public static final int SUCCESS_FOR_SEND = 13;
-    /**
-     * 传输失败(发送)
-     */
-    public static final int FAIL_FOR_SEND = 14;
-    /**
-     * 权限Code
-     */
-    public static final int PERMISSION = 15;
+
+
 }

@@ -23,6 +23,7 @@ public class NetTcpHelper {
      * Handler对象
      */
     private LanMsgHandler mHandler;
+
     /**
      * 获取单例
      *
@@ -38,84 +39,65 @@ public class NetTcpHelper {
         }
         return sInstance;
     }
+
     /**
      * 初始化
+     *
      * @param mHandler LanMsgHandler
      */
     public void init(LanMsgHandler mHandler) {
         this.mHandler = mHandler;
     }
-    /**
-     * 文件开始传输
-     */
-    public void startForReceive() {
-        Message msg = mHandler.obtainMessage(Const.STARTT_FOR_RECEIVE);
-        mHandler.sendMessage(msg);
-    }
-    /**
-     * 文件传输出现异常
-     * @param e Exception
-     */
-    public void failForReceive(Exception e) {
-        Message msg = mHandler.obtainMessage(Const.FAIL_FOR_RECEIVE);
-        msg.obj = e;
-        mHandler.sendMessage(msg);
-    }
-    /**
-     * 文件接收进度
-     * @param name 文件名称
-     * @param alreadyReadBytes 已经上传字节数
-     * @param fileSize 文件总大小
-     */
-    public void uploadForReceive(String name, long alreadyReadBytes, long fileSize) {
-        Message msg = mHandler.obtainMessage(Const.UPLOAD_FOR_RECEIVE);
-        msg.obj = name + "," + alreadyReadBytes + "," + fileSize;
-        mHandler.sendMessage(msg);
-    }
-    /**
-     * 文件传输成功回调
-     * @param fileName 文件名称
-     */
-    public void successForReceive(String fileName) {
-        Message msg = mHandler.obtainMessage(Const.SUCCESS_FOR_RECEIVE);
-        msg.obj = fileName;
-        mHandler.sendMessage(msg);
-    }
+
     /**
      * 文件上传进度
-     * @param name 文件名称
+     *
+     * @param flag             7为开始发送，8为开始接收
+     * @param name             文件名称
      * @param alreadyReadBytes 已经上传字节数
-     * @param fileSize 文件总大小
+     * @param fileSize         文件总大小
      */
-    public void uploadForSend(String name, long alreadyReadBytes, long fileSize) {
-        Message msg = mHandler.obtainMessage(Const.UPLOAD_FOR_SEND);
+    public void upLoading(int flag, String name, long alreadyReadBytes, long fileSize) {
+        Message msg = mHandler.obtainMessage(Const.IS_SEND_OR_RECEIVE_UPLOAD);
+        msg.arg1 = flag;
         msg.obj = name + "," + alreadyReadBytes + "," + fileSize;
         mHandler.sendMessage(msg);
     }
 
     /**
-     * 文件传输成功回调
-     * @param fileName 文件名称
-     */
-    public void successForSend(String fileName) {
-        Message msg = mHandler.obtainMessage(Const.SUCCESS_FOR_SEND);
-        msg.obj = fileName;
-        mHandler.sendMessage(msg);
-    }
-    /**
      * 文件开始传输
+     *
+     * @param flag 7为开始发送，8为开始接收
      */
-    public void startForSend() {
-        Message msg = mHandler.obtainMessage(Const.STARTT_FOR_SEND);
+    public void startTransmission(int flag) {
+        Message msg = mHandler.obtainMessage(Const.IS_SEND_OR_RECEIVE_START);
+        msg.arg1 = flag;
         mHandler.sendMessage(msg);
     }
+
     /**
      * 文件传输出现异常
-     * @param e Exception
+     *
+     * @param e    Exception
+     * @param flag 7为开始发送，8为开始接收
      */
-    public void failForSend(Exception e) {
-        Message msg = mHandler.obtainMessage(Const.FAIL_FOR_SEND);
+    public void failForReceiveOrSend(Exception e, int flag) {
+        Message msg = mHandler.obtainMessage(Const.IS_SEND_OR_RECEIVE_FAIL);
+        msg.arg1 = flag;
         msg.obj = e;
+        mHandler.sendMessage(msg);
+    }
+
+    /**
+     * 文件传输成功
+     *
+     * @param fileName 文件名称
+     * @param flag     7为开始发送，8为开始接收
+     */
+    public void successForReceiveOrSend(String fileName, int flag) {
+        Message msg = mHandler.obtainMessage(Const.IS_SEND_OR_RECEIVE_SUCCESS);
+        msg.arg1 = flag;
+        msg.obj = fileName;
         mHandler.sendMessage(msg);
     }
 

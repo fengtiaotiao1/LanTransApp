@@ -126,7 +126,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     protected void onDestroy() {
         super.onDestroy();
         LanTransAgent.getInstance(this).release();
-        
+
     }
 
     /**
@@ -195,29 +195,32 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     private void setReceiveListener() {
         LanTransAgent.getInstance(MainActivity.this).registerFileReceiveListener(new FileStatusListener() {
             @Override
-            public void startTransmission() {
-                Message msg = mHandler.obtainMessage(Const.STARTT_FOR_RECEIVE);
+            public void startTransmission(int flag) {
+                Message msg = mHandler.obtainMessage(Const.IS_SEND_OR_RECEIVE_START);
+                msg.arg1 = flag;
                 mHandler.sendMessage(msg);
             }
 
             @Override
-            public void upload(final String name, final long schedule, final long fileSize) {
-                Message msg = mHandler.obtainMessage(Const.UPLOAD_FOR_RECEIVE);
-                int percent = (int)(schedule *  100 / fileSize);
-                msg.arg1 = percent;
+            public void upload(int flag, final String name, final long schedule, final long fileSize) {
+                Message msg = mHandler.obtainMessage(Const.IS_SEND_OR_RECEIVE_UPLOAD);
+                int percent = (int) (schedule * 100 / fileSize);
                 msg.obj = name;
+                msg.arg1 = flag;
+                msg.arg2 = percent;
                 mHandler.sendMessage(msg);
             }
 
             @Override
-            public void success(final String fileName) {
-                Message msg = mHandler.obtainMessage(Const.SUCCESS_FOR_RECEIVE);
+            public void success(int flag, final String fileName) {
+                Message msg = mHandler.obtainMessage(Const.IS_SEND_OR_RECEIVE_SUCCESS);
+                msg.arg1 = flag;
                 msg.obj = fileName;
                 mHandler.sendMessage(msg);
             }
 
             @Override
-            public void fail(Exception e) {
+            public void fail(int flag, Exception e) {
 
             }
         });
@@ -234,29 +237,30 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 case DISCOVERY_DEVICE:
                     mProgressLoadDialog.dismiss();
                     break;
-                case Const.STARTT_FOR_RECEIVE:
-                    mReceiveLl.setVisibility(View.VISIBLE);
+                case Const.IS_SEND_OR_RECEIVE_START:
+                    if (Const.SEND == msg.arg1) {
+                        mSendLl.setVisibility(View.VISIBLE);
+                    } else if (Const.RECEIVE == msg.arg1) {
+                        mReceiveLl.setVisibility(View.VISIBLE);
+                    }
                     break;
-                case Const.UPLOAD_FOR_RECEIVE:
-                    String fileName = (String) msg.obj;
-                    mReceiveTv.setText(fileName);
-                    mReceivePb.setProgress(msg.arg1);
+                case Const.IS_SEND_OR_RECEIVE_SUCCESS:
+                    if (Const.SEND == msg.arg1) {
+                        mSendTv.setText(MainActivity.this.getString(R.string.send_success));
+                        mSendPb.setProgress(100);
+                    } else if (Const.RECEIVE == msg.arg1) {
+                        mReceiveTv.setText(MainActivity.this.getString(R.string.receive_success));
+                        mReceivePb.setProgress(100);
+                    }
                     break;
-                case Const.SUCCESS_FOR_RECEIVE:
-                    mReceiveTv.setText(MainActivity.this.getString(R.string.receive_success));
-                    mReceivePb.setProgress(100);
-                    break;
-
-                case Const.STARTT_FOR_SEND:
-                    mSendLl.setVisibility(View.VISIBLE);
-                    break;
-                case Const.UPLOAD_FOR_SEND:
-                    mSendTv.setText((String) msg.obj);
-                    mSendPb.setProgress(msg.arg1);
-                    break;
-                case Const.SUCCESS_FOR_SEND:
-                    mSendTv.setText(MainActivity.this.getString(R.string.send_success));
-                    mSendPb.setProgress(100);
+                case Const.IS_SEND_OR_RECEIVE_UPLOAD:
+                    if (Const.SEND == msg.arg1) {
+                        mSendTv.setText((String) msg.obj);
+                        mSendPb.setProgress(msg.arg2);
+                    } else if (Const.RECEIVE == msg.arg1) {
+                        mReceiveTv.setText((String) msg.obj);
+                        mReceivePb.setProgress(msg.arg2);
+                    }
                     break;
                 default:
                     break;
@@ -273,29 +277,32 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
         LanTransAgent.getInstance(MainActivity.this).registerFileSendListener(new FileStatusListener() {
             @Override
-            public void startTransmission() {
-                Message msg = mHandler.obtainMessage(Const.STARTT_FOR_SEND);
+            public void startTransmission(int flag) {
+                Message msg = mHandler.obtainMessage(Const.IS_SEND_OR_RECEIVE_START);
+                msg.arg1 = flag;
                 mHandler.sendMessage(msg);
             }
 
             @Override
-            public void upload(final String name, final long schedule, final long fileSize) {
-                Message msg = mHandler.obtainMessage(Const.UPLOAD_FOR_SEND);
-                int percent = (int)(schedule *  100 / fileSize);
+            public void upload(int flag, final String name, final long schedule, final long fileSize) {
+                Message msg = mHandler.obtainMessage(Const.IS_SEND_OR_RECEIVE_UPLOAD);
+                int percent = (int) (schedule * 100 / fileSize);
                 msg.obj = name;
-                msg.arg1 = percent;
+                msg.arg1 = flag;
+                msg.arg2 = percent;
                 mHandler.sendMessage(msg);
             }
 
             @Override
-            public void success(final String fileName) {
-                Message msg = mHandler.obtainMessage(Const.SUCCESS_FOR_SEND);
+            public void success(int flag, final String fileName) {
+                Message msg = mHandler.obtainMessage(Const.IS_SEND_OR_RECEIVE_SUCCESS);
+                msg.arg1 = flag;
                 msg.obj = fileName;
                 mHandler.sendMessage(msg);
             }
 
             @Override
-            public void fail(Exception e) {
+            public void fail(int flag, Exception e) {
 
             }
         });
@@ -395,7 +402,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                         if (allPermissions == false) {
                             //应该请求授权
                             ActivityCompat.requestPermissions(MainActivity.this, mPermissions, Const.PERMISSION);
-                        }else {
+                        } else {
                             LanTransAgent.getInstance(MainActivity.this).receiveFile(mlanUser.getIp());
                             LanTransAgent.getInstance(MainActivity.this).receiveFiles();
                         }
