@@ -12,4 +12,15 @@
     <string name="receive_success">接收成功</string>
     <string name="send_success">发送成功</string>
     <string name="allow">必须同意权限才可进入</string>
+    <string name="str_name">名称</string>
+    <string name="str_size">大小</string>
+    <string name="tip_has_no_apk_info">暂时找不到应用的信息</string>
+    <string name="str_has_selected">已选（0）</string>
+    <string name="str_has_selected_detail">已选（%d）</string>
+    <string-array name="array_res">
+        <item>应用</item>
+        <item>图片</item>
+        <item>音乐</item>
+        <item>视频</item>
+    </string-array>
 </resources>

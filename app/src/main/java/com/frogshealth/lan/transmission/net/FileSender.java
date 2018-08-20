@@ -86,16 +86,17 @@ public class FileSender implements Runnable {
      * @throws IOException 异常
      */
     private void writeFileInfo() throws IOException {
-        StringBuilder headerSb = new StringBuilder();
         String jsonStr = FileInfo.toJsonStr(mFile);
+
         jsonStr = Const.TYPE_FILE + Const.SPERATOR + jsonStr;
-        headerSb.append(jsonStr);
-        int leftLen = Const.BYTE_SIZE_DATA - jsonStr.getBytes(Const.UTF8).length;
-        for (int i = 0; i < leftLen; i++) {
-            headerSb.append(" ");
-        }
-        byte[] headbytes = headerSb.toString().getBytes(Const.UTF8);
-        mOutputStream.write(headbytes);
+
+        int length = jsonStr.getBytes(Const.UTF8).length;
+
+        String s = length + "e";
+
+        mOutputStream.write(s.getBytes());
+
+        mOutputStream.write(jsonStr.getBytes(Const.UTF8));
     }
 
     /**

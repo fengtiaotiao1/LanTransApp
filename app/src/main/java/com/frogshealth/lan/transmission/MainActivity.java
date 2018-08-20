@@ -13,6 +13,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -24,14 +25,16 @@ import com.frogshealth.lan.transmission.handler.LanTransAgent;
 import com.frogshealth.lan.transmission.listener.FileOperateListener;
 import com.frogshealth.lan.transmission.listener.FileStatusListener;
 import com.frogshealth.lan.transmission.listener.UserStateListener;
+import com.frogshealth.lan.transmission.model.FileInfo;
 import com.frogshealth.lan.transmission.model.LanUser;
 import com.frogshealth.lan.transmission.utils.Const;
+import com.frogshealth.lan.transmission.view.BaseBottomView;
 import com.leon.lfilepickerlibrary.LFilePicker;
-import com.leon.lfilepickerlibrary.utils.Constant;
 
-import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**********************************************************************
  * MainActivity
@@ -110,22 +113,46 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     /**
      * LanUser
      */
-    private LanUser mlanUser;
+    private LanUser mLanUser;
+    /**
+     * BaseBottomView
+     */
+    private BaseBottomView mSendView;
+    /**
+     * Ip地址
+     */
+    private String mIp;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        WindowManager wm = (WindowManager) this
+                .getSystemService(Context.WINDOW_SERVICE);
         mContext = MainActivity.this;
+        initDiaLog();
         bindViews();
         initListener();
+    }
+
+    /**
+     * 初始化DiaLog
+     */
+    private void initDiaLog() {
+        mSendView = new BaseBottomView(this, R.layout.send_view);
+        mSendView.setCancelable(true);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         LanTransAgent.getInstance(this).release();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
 
     }
 
@@ -133,12 +160,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
      * 绑定view
      */
     private void bindViews() {
-        mSendLl = findViewById(R.id.ll_send);
-        mReceiveLl = findViewById(R.id.ll_receive);
-        mSendTv = findViewById(R.id.tv_send);
-        mReceiveTv = findViewById(R.id.tv_receive);
-        mSendPb = findViewById(R.id.pb_send);
-        mReceivePb = findViewById(R.id.pb_receive);
+        mSendLl = (LinearLayout) mSendView.findViewById(R.id.ll_send);
+        mReceiveLl = (LinearLayout) mSendView.findViewById(R.id.ll_receive);
+        mSendTv = (TextView) mSendView.findViewById(R.id.tv_send);
+        mReceiveTv = (TextView) mSendView.findViewById(R.id.tv_receive);
+        mSendPb = (ProgressBar) mSendView.findViewById(R.id.pb_send);
+        mReceivePb = (ProgressBar) mSendView.findViewById(R.id.pb_receive);
 
         setSendListener();
         setReceiveListener();
@@ -146,26 +173,42 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         findViewById(R.id.bt_start_discovery).setOnClickListener(this);
         findViewById(R.id.bt_find_file).setOnClickListener(this);
         findViewById(R.id.bt_send_file).setOnClickListener(this);
+        findViewById(R.id.local_files).setOnClickListener(this);
         mTvDeviceInfo = findViewById(R.id.tv_send_device_info);
         mTvFileInfo = findViewById(R.id.tv_send_file_info);
         ListView mLvDeviceList = findViewById(R.id.lv_device_list);
         mProgressLoadDialog = new AlertDialog.Builder(this, R.style.dialog).create();
-
         mAdapter = new LanUserAdapter(mContext, mLanUserList);
         mLvDeviceList.setAdapter(mAdapter);
         mLvDeviceList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String deviceInfo = mLanUserList.get(position).getUserName();
-                mTvDeviceInfo.setText(deviceInfo);
+//                String deviceInfo = mLanUserList.get(position).getUserName();
+//                mTvDeviceInfo.setText(deviceInfo);
+                String ip = mLanUserList.get(position).getIp();
+                Intent intent = new Intent(MainActivity.this, ChooseFileActivity.class);
+                intent.putExtra("ip", ip);
+                startActivityForResult(intent, Const.requestCode);
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Const.resultCode && requestCode == Const.requestCode) {
+
+            mIp = data.getStringExtra("ip");
+            sendFile(mIp);
+        }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         int flag = -1;
         switch (requestCode) {
+            default:
+                break;
             case Const.PERMISSION: {
                 if (grantResults.length > 0) {
                     for (int i = 0; i < grantResults.length; i++) {
@@ -178,11 +221,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                     }
                 }
                 if (flag == 0) {
-                    LanTransAgent.getInstance(MainActivity.this).receiveFile(mlanUser.getIp());
+                    LanTransAgent.getInstance(MainActivity.this).receiveFile(mLanUser.getIp());
+                    mSendView.show();
                     LanTransAgent.getInstance(MainActivity.this).receiveFiles();
                 } else {
                     Toast.makeText(MainActivity.this, MainActivity.this.getString(R.string.allow), Toast.LENGTH_LONG).show();
-                    LanTransAgent.getInstance(MainActivity.this).rejectFile(mlanUser.getIp());
+                    LanTransAgent.getInstance(MainActivity.this).rejectFile(mLanUser.getIp());
                 }
 
             }
@@ -252,6 +296,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                         mReceiveTv.setText(MainActivity.this.getString(R.string.receive_success));
                         mReceivePb.setProgress(100);
                     }
+//                    mSendView.dismiss();
+                    Map<String, FileInfo> fileInfoMap = LanApplication.getAppContext().getFileInfoMap();
+                    fileInfoMap.clear();
                     break;
                 case Const.IS_SEND_OR_RECEIVE_UPLOAD:
                     if (Const.SEND == msg.arg1) {
@@ -318,13 +365,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 chooseFile();
                 break;
             case R.id.bt_send_file:
-                if (mTvDeviceInfo.getText().length() == 0) {
-                    Toast.makeText(mContext, R.string.please_choose_device, Toast.LENGTH_SHORT).show();
-                } else if (mTvFileInfo.getText().length() == 0) {
-                    Toast.makeText(mContext, R.string.please_choose_file, Toast.LENGTH_SHORT).show();
-                } else {
-                    sendFile();
-                }
+                break;
+            case R.id.local_files:
+                final BaseBottomView bottomView = new BaseBottomView(this, R.layout.layout_bottom);
+                bottomView.setCancelable(true);
+                bottomView.show();
                 break;
             default:
                 break;
@@ -343,23 +388,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 .start();
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            mListFiles = data.getStringArrayListExtra(Constant.RESULT_INFO);
-            if (mListFiles != null) {
-                Toast.makeText(getApplicationContext(), String.format(getString(R.string.selected_file_size), mListFiles.size()), Toast.LENGTH_SHORT).show();
-                mTvFileInfo.setText(mListFiles.get(0));
-            }
-        }
-    }
 
     /**
      * 发送文件
+     * @param ip ip地址
      */
-    private void sendFile() {
-        LanTransAgent.getInstance(this).sendFileRequest(mTvDeviceInfo.getText().toString());
+    private void sendFile(String ip) {
+        LanTransAgent.getInstance(this).sendFileRequest(ip);
     }
 
     /**
@@ -383,7 +418,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         if (lanUser == null) {
             return;
         }
-        this.mlanUser = lanUser;
+        this.mLanUser = lanUser;
         AlertDialog.Builder fileReqDialog = new AlertDialog.Builder(this);
         fileReqDialog.setCancelable(false);
         fileReqDialog.setTitle(String.format(getString(R.string.receive_from), lanUser.getUserName()))
@@ -403,10 +438,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                             //应该请求授权
                             ActivityCompat.requestPermissions(MainActivity.this, mPermissions, Const.PERMISSION);
                         } else {
-                            LanTransAgent.getInstance(MainActivity.this).receiveFile(mlanUser.getIp());
+                            LanTransAgent.getInstance(MainActivity.this).receiveFile(mLanUser.getIp());
+                            mSendView.show();
                             LanTransAgent.getInstance(MainActivity.this).receiveFiles();
                         }
-                        System.out.println("XXX  1111");
 
                     }
                 })
@@ -461,12 +496,22 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
     @Override
     public void onReceive() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mSendView.show();
+            }
+        });
+        List<FileInfo> fileInfos = new ArrayList<>();
         //发送文件
-        List<File> list = new ArrayList<>();
-        for (String mListFile : mListFiles) {
-            list.add(new File(mListFile));
+        if (LanApplication.getAppContext().getFileInfoMap() != null && LanApplication.getAppContext().getFileInfoMap().size() > 0) {
+            Map<String, FileInfo> fileInfoMap = LanApplication.getAppContext().getFileInfoMap();
+            Collection<FileInfo> values = fileInfoMap.values();
+            for (FileInfo fileInfo : values) {
+                fileInfos.add(fileInfo);
+            }
         }
-        LanTransAgent.getInstance(MainActivity.this).sendFiles(mTvDeviceInfo.getText().toString(), list);
+        LanTransAgent.getInstance(MainActivity.this).sendFiles(mIp, fileInfos);
     }
 
     @Override

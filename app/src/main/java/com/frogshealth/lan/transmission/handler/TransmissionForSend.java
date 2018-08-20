@@ -34,6 +34,9 @@ public class TransmissionForSend {
         }
     }
 
+    public void setFileInfoList(List<FileInfo> fileInfos) {
+        mFiles = fileInfos;
+    }
     /**
      * 文件转换为FileInfo
      * @param files 文件列表

@@ -6,7 +6,7 @@
     android:layout_height="?android:actionBarSize"
     android:background="@color/colorPrimary">
 
-    <TextView
+    <Button
         android:id="@+id/tv_layout_choose_file_back"
         android:layout_width="36dp"
         android:layout_height="36dp"

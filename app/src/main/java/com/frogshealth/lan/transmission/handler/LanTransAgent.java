@@ -9,6 +9,7 @@ import android.os.IBinder;
 import com.frogshealth.lan.transmission.listener.FileOperateListener;
 import com.frogshealth.lan.transmission.listener.FileStatusListener;
 import com.frogshealth.lan.transmission.listener.UserStateListener;
+import com.frogshealth.lan.transmission.model.FileInfo;
 import com.frogshealth.lan.transmission.model.LanUser;
 import com.frogshealth.lan.transmission.net.NetTcpHelper;
 import com.frogshealth.lan.transmission.net.NetUdpHelper;
@@ -70,9 +71,9 @@ public final class LanTransAgent {
      * @param address 地址
      * @param files 文件列表
      */
-    public void sendFiles(String address, List<File> files) {
+    public void sendFiles(String address, List<FileInfo> files) {
         TransmissionForSend transmissionForSend = new TransmissionForSend();
-        transmissionForSend.files2FileInfo(files);
+        transmissionForSend.setFileInfoList(files);
         transmissionForSend.sendFiles(address, Const.DEFAULT_SERVER_PORT);
     }
 

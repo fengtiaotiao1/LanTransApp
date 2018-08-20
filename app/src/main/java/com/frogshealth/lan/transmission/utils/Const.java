@@ -88,9 +88,12 @@ public class Const {
     /**
      * 每次读取字节数组长度
      */
-    public static final int BYTE_SIZE_DATA = 1024 * 4;
+    public static final int BYTE_SIZE_INFO = 1024  * 300;
 
-
+    /**
+     * 每次读取字节数组长度
+     */
+    public static final int BYTE_SIZE_DATA = 4  * 1024;
     /**
      * 文件传输监听 默认端口
      */
@@ -100,11 +103,44 @@ public class Const {
      * 文件保存路径
      */
     public static final String SAVE_PATH = "file-save";
-
     /**
      * 默认文件选择路径
      */
     public static final String PATH = Environment.getExternalStorageDirectory().getPath() + "/com.tencent.ma.app/log/";
 
 
+    /**
+     * APK
+     */
+    public static final int TYPE_APK = 16;
+    /**
+     * JPG
+     */
+    public static final int TYPE_JPG = 17;
+    /**
+     * MP3
+     */
+    public static final int TYPE_MP3 = 18;
+    /**
+     * MP4
+     */
+    public static final int TYPE_MP4 = 19;
+
+    /**
+     * 常见文件拓展名
+     */
+    public static final String EXTEND_APK = ".apk";
+    public static final String EXTEND_JPEG = ".jpeg";
+    public static final String EXTEND_JPG = ".jpg";
+    public static final String EXTEND_PNG = ".png";
+    public static final String EXTEND_MP3 = ".mp3";
+    public static final String EXTEND_MP4 = ".mp4";
+    /**
+     * requestCode
+     */
+    public static final int requestCode = 20;
+    /**
+     * resultCode
+     */
+    public static final int resultCode = 21;
 }

@@ -30,7 +30,7 @@
         <service android:name=".service.LanTransService"/>
 
         <activity android:name=".BaseActivity"/>
-        <activity android:name=".ChooseFileActivity"/>
+        <activity android:name=".ChooseFileActivity" android:theme="@style/ChooseFileActicityStyle"/>
     </application>
 
 </manifest>

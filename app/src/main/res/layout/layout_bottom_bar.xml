@@ -14,6 +14,7 @@
         android:gravity="center">
         
         <Button
+            android:id="@+id/has_selected"
             android:layout_width="128dp"
             android:layout_height="wrap_content"
             android:text="已选"
@@ -28,6 +29,7 @@
         android:gravity="center">
 
         <Button
+            android:id="@+id/send_file"
             android:layout_width="128dp"
             android:layout_height="wrap_content"
             android:text="发送文件"/>

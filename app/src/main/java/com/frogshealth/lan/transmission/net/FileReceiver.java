@@ -76,14 +76,24 @@ public class FileReceiver implements Runnable {
      * @throws IOException 异常
      */
     private void parseHeader() throws IOException {
-        byte[] headerBytes = new byte[Const.BYTE_SIZE_DATA];
         int headTotal = 0;
         int readByte = -1;
+        StringBuffer buffer = new StringBuffer();
+        while ((readByte = mInputStream.read()) != -1) {
+            char c = (char) readByte;
+            if (c == 'e') {
+                break;
+            }
+            buffer.append(c);
+        }
+        readByte = -1;
+        int  length = Integer.parseInt(buffer.toString());
+        byte[] headerBytes = new byte[length];
         //开始读取header
         while ((readByte = mInputStream.read()) != -1) {
             headerBytes[headTotal] = (byte) readByte;
             headTotal++;
-            if (headTotal == headerBytes.length) {
+            if (headTotal == length) {
                 break;
             }
         }

@@ -5,4 +5,9 @@
     <color name="colorAccent">#FF4081</color>
     <color name="colorWhite">#FFFFFF</color>
     <color name="transparent">#55000000</color>
+
+    <!--覆盖颜色-->
+    <color name="bgColor_overlay">#60000000</color>
+    <color name="black">@android:color/black</color>
+    <color name="darker_gray">@android:color/darker_gray</color>
 </resources>

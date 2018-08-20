@@ -1,5 +1,7 @@
 package com.frogshealth.lan.transmission.model;
 
+import android.graphics.Bitmap;
+
 import com.google.gson.Gson;
 
 /**********************************************************************
@@ -12,6 +14,11 @@ import com.google.gson.Gson;
  * @创建日期 2018/8/3
  ***********************************************************************/
 public class FileInfo {
+
+    /**
+     * 文件大小描述
+     */
+    private String mSizeDesc;
     /**
      * 文件路径
      */
@@ -24,6 +31,16 @@ public class FileInfo {
      * 文件的长度
      */
     private long mFileSize;
+    /**
+     * 文件缩略图
+     */
+    private Bitmap mBitmap;
+    /**
+     * 文件类型
+     */
+    private int mFileType;
+
+
 
     public long getFileSize() {
         return mFileSize;
@@ -39,11 +56,35 @@ public class FileInfo {
         this.mFileSize = mFileSize;
     }
 
+    public String getSizeDesc() {
+        return mSizeDesc;
+    }
+
+    public void setSizeDesc(String sizeDesc) {
+        this.mSizeDesc = sizeDesc;
+    }
+
+    public void setBitmap(Bitmap bitmap) {
+        this.mBitmap = bitmap;
+    }
+
+    public Bitmap getBitmap() {
+        return mBitmap;
+    }
+
     public FileInfo() {
     }
 
     public String getPath() {
         return mPath;
+    }
+
+    public void setFileType(int fileType) {
+        this.mFileType = fileType;
+    }
+
+    public int getFileType() {
+        return mFileType;
     }
 
     public void setPath(String path) {
