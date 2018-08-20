@@ -88,7 +88,9 @@ public class FileSender implements Runnable {
     private void writeFileInfo() throws IOException {
         String jsonStr = FileInfo.toJsonStr(mFile);
 
-        jsonStr = Const.TYPE_FILE + Const.SPERATOR + jsonStr;
+        StringBuffer headerSb = new StringBuffer();
+
+        jsonStr = Const.TYPE_FILE + Const.SEPARATOR + jsonStr;
 
         int length = jsonStr.getBytes(Const.UTF8).length;
 
@@ -97,6 +99,7 @@ public class FileSender implements Runnable {
         mOutputStream.write(s.getBytes());
 
         mOutputStream.write(jsonStr.getBytes(Const.UTF8));
+
     }
 
     /**

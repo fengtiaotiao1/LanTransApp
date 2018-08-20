@@ -83,7 +83,7 @@ public class Const {
     /**
      * 头部分割字符
      */
-    public static final String SPERATOR = "::";
+    public static final String SEPARATOR = "::";
 
     /**
      * 每次读取字节数组长度
@@ -107,7 +107,6 @@ public class Const {
      * 默认文件选择路径
      */
     public static final String PATH = Environment.getExternalStorageDirectory().getPath() + "/com.tencent.ma.app/log/";
-
 
     /**
      * APK
