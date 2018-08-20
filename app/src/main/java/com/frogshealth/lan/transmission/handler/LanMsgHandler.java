@@ -45,15 +45,26 @@ public class LanMsgHandler extends Handler {
 
     @Override
     public void handleMessage(Message msg) {
+        Object[] objects;
         switch (msg.what) {
             case Const.MSG_FILE_RECEIVE:
             case Const.MSG_FILE_REJECT:
             case Const.MSG_FILE_SEND_REQUEST:
-                handleFileMsg(msg.what, (LanUser) msg.obj);
+                objects = (Object[]) msg.obj;
+                if (objects.length == 1) {
+                    handleFileMsg(msg.what, (String) objects[0], null);
+                } else {
+                    handleFileMsg(msg.what, (String) objects[0], (String) objects[1]);
+                }
                 break;
             case Const.MSG_USER_ONLINE:
             case Const.MSG_USER_OFFLINE:
-                handleUserMsg(msg.what, (LanUser) msg.obj);
+                objects = (Object[]) msg.obj;
+                if (objects.length == 1) {
+                    handleUserMsg(msg.what, (String) objects[0], null);
+                } else {
+                    handleUserMsg(msg.what, (String) objects[0], (String) objects[1]);
+                }
                 break;
             case Const.IS_SEND_OR_RECEIVE_START:
                 receiveOrSend_Start(msg.arg1);
@@ -221,9 +232,10 @@ public class LanMsgHandler extends Handler {
      * 处理文件消息
      *
      * @param msgType 消息类型
-     * @param user    用户信息
+     * @param srcAddr 源地址
+     * @param msg     额外信息
      */
-    private void handleFileMsg(int msgType, LanUser user) {
+    private void handleFileMsg(int msgType, String srcAddr, String msg) {
         synchronized (mFileListeners) {
             for (FileOperateListener listener : mFileListeners) {
                 if (listener == null) {
@@ -237,7 +249,7 @@ public class LanMsgHandler extends Handler {
                         listener.onReject();
                         break;
                     case Const.MSG_FILE_SEND_REQUEST:
-                        listener.onSendRequest(user);
+                        listener.onSendRequest(new LanUser(srcAddr, srcAddr));
                         break;
                     default:
                         break;
@@ -250,9 +262,10 @@ public class LanMsgHandler extends Handler {
      * 处理用户消息
      *
      * @param msgType 消息类型
-     * @param user    用户信息
+     * @param srcAddr 源地址
+     * @param msg     额外信息
      */
-    private void handleUserMsg(int msgType, LanUser user) {
+    private void handleUserMsg(int msgType, String srcAddr, String msg) {
         synchronized (mUserListeners) {
             for (UserStateListener listener : mUserListeners) {
                 if (listener == null) {
@@ -260,10 +273,10 @@ public class LanMsgHandler extends Handler {
                 }
                 switch (msgType) {
                     case Const.MSG_USER_ONLINE:
-                        listener.online(user);
+                        listener.online(new LanUser(srcAddr, srcAddr));
                         break;
                     case Const.MSG_USER_OFFLINE:
-                        listener.offline(user);
+                        listener.offline(new LanUser(srcAddr, srcAddr));
                         break;
                     default:
                         break;

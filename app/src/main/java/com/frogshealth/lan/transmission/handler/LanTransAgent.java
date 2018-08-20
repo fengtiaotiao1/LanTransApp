@@ -4,8 +4,10 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
+
 import com.frogshealth.lan.transmission.listener.FileOperateListener;
 import com.frogshealth.lan.transmission.listener.FileStatusListener;
 import com.frogshealth.lan.transmission.listener.UserStateListener;
@@ -17,7 +19,6 @@ import com.frogshealth.lan.transmission.service.LanTransService;
 import com.frogshealth.lan.transmission.utils.Const;
 import com.frogshealth.lan.transmission.utils.FileUtils;
 
-import java.io.File;
 import java.util.List;
 
 /**********************************************************************
@@ -28,7 +29,7 @@ import java.util.List;
  * @author yuanjf
  * @创建日期 18/8/2
  ***********************************************************************/
-public final class LanTransAgent {
+public class LanTransAgent {
 
     /**
      * 单例
@@ -47,12 +48,16 @@ public final class LanTransAgent {
      */
     private HandlerThread mThread;
 
-    private LanTransAgent(Context context) {
+    public LanTransAgent(Context context) {
         this.mContext = context;
+        mThread = new HandlerThread("lan-trans");
+        mThread.start();
+        mHandler = new LanMsgHandler(mThread);
     }
 
     /**
      * 获取单例
+     *
      * @param context Context
      * @return 单例
      */
@@ -60,7 +65,8 @@ public final class LanTransAgent {
         if (sInstance == null) {
             synchronized (LanTransAgent.class) {
                 if (sInstance == null) {
-                    sInstance = new LanTransAgent(context);
+                    //TODO 默认采用so方式
+                    sInstance = new LanTransImpl(context);
                 }
             }
         }
@@ -68,9 +74,19 @@ public final class LanTransAgent {
     }
 
     /**
+     * 获取消息处理句柄
+     *
+     * @return 消息处理句柄
+     */
+    public Handler getHandler() {
+        return mHandler;
+    }
+
+    /**
      * 发送文件
+     *
      * @param address 地址
-     * @param files 文件列表
+     * @param files   文件列表
      */
     public void sendFiles(String address, List<FileInfo> files) {
         TransmissionForSend transmissionForSend = new TransmissionForSend();
@@ -97,6 +113,7 @@ public final class LanTransAgent {
 
     /**
      * 设置文件发送监听
+     *
      * @param statusListener 传输监听
      */
     public void registerFileSendListener(FileStatusListener statusListener) {
@@ -198,9 +215,6 @@ public final class LanTransAgent {
      */
     public void init() {
 //        bindService();
-        mThread = new HandlerThread("lan-trans");
-        mThread.start();
-        mHandler = new LanMsgHandler(mThread);
         NetUdpHelper.getInstance().init(mHandler);
         NetTcpHelper.getInstance().init(mHandler);
     }
@@ -224,7 +238,6 @@ public final class LanTransAgent {
         mContext = null;
         System.exit(0);
     }
-
 
 
     /**

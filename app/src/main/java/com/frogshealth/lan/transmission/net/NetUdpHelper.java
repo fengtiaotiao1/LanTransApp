@@ -143,14 +143,18 @@ public final class NetUdpHelper implements Runnable {
                     break;
                 case Const.MSG_FILE_SEND_REQUEST:
                     Message msg = mHandler.obtainMessage(Const.MSG_FILE_SEND_REQUEST);
-                    msg.obj = new LanUser(mUdpRecvPacket.getAddress().getHostAddress(), mUdpRecvPacket.getAddress().getHostAddress());
+                    msg.obj = new Object[]{mUdpRecvPacket.getAddress().getHostAddress()};
                     mHandler.sendMessage(msg);
                     break;
                 case Const.MSG_FILE_RECEIVE:
-                    mHandler.sendEmptyMessage(Const.MSG_FILE_RECEIVE);
+                    msg = mHandler.obtainMessage(Const.MSG_FILE_RECEIVE);
+                    msg.obj = new Object[]{mUdpRecvPacket.getAddress().getHostAddress()};
+                    mHandler.sendMessage(msg);
                     break;
                 case Const.MSG_FILE_REJECT:
-                    mHandler.sendEmptyMessage(Const.MSG_FILE_REJECT);
+                    msg = mHandler.obtainMessage(Const.MSG_FILE_REJECT);
+                    msg.obj = new Object[]{mUdpRecvPacket.getAddress().getHostAddress()};
+                    mHandler.sendMessage(msg);
                     break;
                 default:
                     break;
@@ -247,6 +251,7 @@ public final class NetUdpHelper implements Runnable {
 
     /**
      * 初始化
+     *
      * @param handler Handler
      */
     public void init(Handler handler) {
@@ -328,11 +333,10 @@ public final class NetUdpHelper implements Runnable {
         mUsers.add(user);
         //新用户上线通知
         Message msg = mHandler.obtainMessage(Const.MSG_USER_ONLINE);
-        msg.obj = user;
+        msg.obj = new Object[]{name};
         mHandler.sendMessage(msg);
 
     }
-
 
 
     /**
