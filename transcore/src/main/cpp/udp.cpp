@@ -97,9 +97,9 @@ void *UDP::recvData(void *arg) {
         if (ret <= 0) {
             LOGD("read data error....");
         } else {
-//            if (fromAddr.compare(localIp) == 0) {
-//                continue;
-//            }
+            if (fromAddr.compare(localIp) == 0) {
+                continue;
+            }
             vector<string> array = Utils::split(readMsg, ":");
             int cmd = atoi(array[array.size() - 2].c_str());
             string msg = array[array.size() - 1];

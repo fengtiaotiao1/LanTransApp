@@ -8,7 +8,8 @@
 JavaVM *jvm = NULL;
 jclass global_clazz = NULL;
 jobject global_object = NULL;
-jmethodID m_method = NULL;
+jmethodID m_udp_method = NULL;
+jmethodID m_file_method = NULL;
 
 JNIEXPORT void JNICALL
 Java_com_frogshealth_lan_transcore_JavaHelper_udpInit(JNIEnv *env, jobject obj) {
@@ -17,8 +18,10 @@ Java_com_frogshealth_lan_transcore_JavaHelper_udpInit(JNIEnv *env, jobject obj) 
         LOGE("global_clazz init failed");
     }
     global_object = env->NewGlobalRef(obj);
-    m_method = env->GetMethodID(global_clazz, "onMsgNotify",
-                                "(ILjava/lang/String;Ljava/lang/String;)V");
+    m_udp_method = env->GetMethodID(global_clazz, "onMsgNotify",
+                                    "(ILjava/lang/String;Ljava/lang/String;)V");
+    m_file_method = env->GetMethodID(global_clazz, "onFileTransNotify",
+                                     "(IILjava/lang/String;I)V");
     UDP::initUdp();
 }
 
@@ -43,8 +46,8 @@ Java_com_frogshealth_lan_transcore_JavaHelper_sendFileReq(JNIEnv *env, jobject o
 }
 
 JNIEXPORT void JNICALL
-Java_com_frogshealth_lan_transcore_JavaHelper_rejectFile(JNIEnv *env, jobject obj,
-                                                         jstring destAddr, jstring fileName) {
+Java_com_frogshealth_lan_transcore_JavaHelper_rejectFileResp(JNIEnv *env, jobject obj,
+                                                             jstring destAddr, jstring fileName) {
     if (destAddr == NULL) {
         return;
     }
@@ -63,8 +66,8 @@ Java_com_frogshealth_lan_transcore_JavaHelper_rejectFile(JNIEnv *env, jobject ob
 }
 
 JNIEXPORT void JNICALL
-Java_com_frogshealth_lan_transcore_JavaHelper_receiveFile(JNIEnv *env, jobject obj,
-                                                          jstring destAddr, jstring fileName) {
+Java_com_frogshealth_lan_transcore_JavaHelper_receiveFileResp(JNIEnv *env, jobject obj,
+                                                              jstring destAddr, jstring fileName) {
     if (destAddr == NULL) {
         return;
     }
@@ -93,6 +96,18 @@ JNIEXPORT void JNICALL
 Java_com_frogshealth_lan_transcore_JavaHelper_offlineNotify(JNIEnv *env, jobject obj) {
 
     UDP::sendUdpData(CMD_TYPE_OFFLINE, BROADCAST_ADDR, NULL_MSG);
+}
+
+JNIEXPORT void JNICALL
+Java_com_frogshealth_lan_transcore_JavaHelper_sendFiles(JNIEnv *env, jobject object,
+                                                        jstring destAddr, jstring path) {
+
+}
+
+JNIEXPORT void JNICALL
+Java_com_frogshealth_lan_transcore_JavaHelper_receiveFiles(JNIEnv *env, jobject object,
+                                                           jstring path) {
+
 }
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
@@ -125,7 +140,7 @@ JNIEnv *getJNIEnv(int *needDetach) {
 void notify(int cmd, string srcAddr, string msg) {
     int needDetach;
     JNIEnv *env = getJNIEnv(&needDetach);
-    env->CallVoidMethod(global_object, m_method, cmd, env->NewStringUTF(srcAddr.c_str()),
+    env->CallVoidMethod(global_object, m_udp_method, cmd, env->NewStringUTF(srcAddr.c_str()),
                         env->NewStringUTF(msg.c_str()));
     jthrowable exception = env->ExceptionOccurred();
     if (exception) {

@@ -5,6 +5,7 @@ import android.content.Context;
 import com.frogshealth.lan.transcore.JavaHelper;
 import com.frogshealth.lan.transmission.model.FileInfo;
 import com.frogshealth.lan.transmission.model.LanUser;
+import com.frogshealth.lan.transmission.utils.FileUtils;
 
 import java.util.List;
 
@@ -21,9 +22,14 @@ public class LanTransImpl extends LanTransAgent {
      * JAVA2C辅助类
      */
     private JavaHelper mJ2CHelper;
+    /**
+     * 上下文
+     */
+    private Context mContext;
 
     public LanTransImpl(Context context) {
         super(context);
+        mContext = context;
         mJ2CHelper = new JavaHelper(getHandler());
     }
 
@@ -34,10 +40,16 @@ public class LanTransImpl extends LanTransAgent {
 
     @Override
     public void sendFiles(String address, List<FileInfo> files) {
+        //TODO 目前只发送单一文件
+        if (files == null || files.isEmpty()) {
+            return;
+        }
+        mJ2CHelper.sendFiles(address, files.get(0).getPath());
     }
 
     @Override
     public void receiveFiles() {
+        mJ2CHelper.receiveFiles(FileUtils.getFileSavePath(this.mContext).getAbsolutePath());
     }
 
     @Override
@@ -52,10 +64,12 @@ public class LanTransImpl extends LanTransAgent {
 
     @Override
     public void receiveFile(String toAddress) {
+        mJ2CHelper.receiveFileResp(toAddress, null);
     }
 
     @Override
     public void rejectFile(String toAddress) {
+        mJ2CHelper.rejectFileResp(toAddress, null);
     }
 
     @Override

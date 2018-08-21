@@ -246,9 +246,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             }
 
             @Override
-            public void upload(int flag, final String name, final long schedule, final long fileSize) {
+            public void upload(int flag, final String name, int percent) {
                 Message msg = mHandler.obtainMessage(Const.IS_SEND_OR_RECEIVE_UPLOAD);
-                int percent = (int) (schedule * 100 / fileSize);
                 msg.obj = name;
                 msg.arg1 = flag;
                 msg.arg2 = percent;
@@ -331,9 +330,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             }
 
             @Override
-            public void upload(int flag, final String name, final long schedule, final long fileSize) {
+            public void upload(int flag, final String name, int percent) {
                 Message msg = mHandler.obtainMessage(Const.IS_SEND_OR_RECEIVE_UPLOAD);
-                int percent = (int) (schedule * 100 / fileSize);
                 msg.obj = name;
                 msg.arg1 = flag;
                 msg.arg2 = percent;
@@ -391,6 +389,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
     /**
      * 发送文件
+     *
      * @param ip ip地址
      */
     private void sendFile(String ip) {

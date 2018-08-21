@@ -18,18 +18,26 @@ JNIEXPORT void JNICALL
 Java_com_frogshealth_lan_transcore_JavaHelper_sendFileReq(JNIEnv *env, jobject obj,
                                                           jstring destAddr, jstring fileName);
 JNIEXPORT void JNICALL
-Java_com_frogshealth_lan_transcore_JavaHelper_rejectFile(JNIEnv *env, jobject obj,
-                                                         jstring destAddr, jstring fileName);
+Java_com_frogshealth_lan_transcore_JavaHelper_rejectFileResp(JNIEnv *env, jobject obj,
+                                                             jstring destAddr, jstring fileName);
 
 JNIEXPORT void JNICALL
-Java_com_frogshealth_lan_transcore_JavaHelper_receiveFile(JNIEnv *env, jobject obj,
-                                                          jstring destAddr, jstring fileName);
+Java_com_frogshealth_lan_transcore_JavaHelper_receiveFileResp(JNIEnv *env, jobject obj,
+                                                              jstring destAddr, jstring fileName);
 
 JNIEXPORT void JNICALL
 Java_com_frogshealth_lan_transcore_JavaHelper_onlineNotify(JNIEnv *env, jobject obj);
 
 JNIEXPORT void JNICALL
 Java_com_frogshealth_lan_transcore_JavaHelper_offlineNotify(JNIEnv *env, jobject obj);
+
+JNIEXPORT void JNICALL
+Java_com_frogshealth_lan_transcore_JavaHelper_sendFiles(JNIEnv *env, jobject object,
+                                                        jstring destAddr, jstring path);
+
+JNIEXPORT void JNICALL
+Java_com_frogshealth_lan_transcore_JavaHelper_receiveFiles(JNIEnv *env, jobject object,
+                                                           jstring path);
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved);
 }

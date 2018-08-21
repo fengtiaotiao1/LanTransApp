@@ -57,6 +57,7 @@ public class LanMsgHandler extends Handler {
                     handleFileMsg(msg.what, (String) objects[0], (String) objects[1]);
                 }
                 break;
+            case Const.MSG_ONLINE_ANSWER:
             case Const.MSG_USER_ONLINE:
             case Const.MSG_USER_OFFLINE:
                 objects = (Object[]) msg.obj;
@@ -76,9 +77,7 @@ public class LanMsgHandler extends Handler {
                 receiveOrSend_Success(msg.arg1, (String) msg.obj);
                 break;
             case Const.IS_SEND_OR_RECEIVE_UPLOAD:
-                String sendString = (String) msg.obj;
-                String[] parameter = sendString.split(",");
-                receiveOrSend_UpLoading(msg.arg1, parameter[0], parameter[1], parameter[2]);
+                receiveOrSend_Uploading(msg.arg1, (String) msg.obj, msg.arg2);
                 break;
             default:
                 break;
@@ -90,17 +89,16 @@ public class LanMsgHandler extends Handler {
      *
      * @param flag    发送或者接收
      * @param name    文件名称
-     * @param current 已经传输的字节数
-     * @param total   文件总长度
+     * @param percent 传输百分比
      */
-    private void receiveOrSend_UpLoading(int flag, String name, String current, String total) {
+    private void receiveOrSend_Uploading(int flag, String name, int percent) {
         if (Const.SEND == flag) {
             if (mFileSendListener != null) {
-                mFileSendListener.upload(flag, name, Long.parseLong(current), Long.parseLong(total));
+                mFileSendListener.upload(flag, name, percent);
             }
         } else if (Const.RECEIVE == flag) {
             if (mFileReceiveListener != null) {
-                mFileReceiveListener.upload(flag, name, Long.parseLong(current), Long.parseLong(total));
+                mFileReceiveListener.upload(flag, name, percent);
             }
         }
     }
@@ -273,6 +271,7 @@ public class LanMsgHandler extends Handler {
                 }
                 switch (msgType) {
                     case Const.MSG_USER_ONLINE:
+                    case Const.MSG_ONLINE_ANSWER:
                         listener.online(new LanUser(srcAddr, srcAddr));
                         break;
                     case Const.MSG_USER_OFFLINE:

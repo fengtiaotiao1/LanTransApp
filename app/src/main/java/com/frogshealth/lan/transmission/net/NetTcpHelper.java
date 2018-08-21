@@ -60,7 +60,8 @@ public class NetTcpHelper {
     public void upLoading(int flag, String name, long alreadyReadBytes, long fileSize) {
         Message msg = mHandler.obtainMessage(Const.IS_SEND_OR_RECEIVE_UPLOAD);
         msg.arg1 = flag;
-        msg.obj = name + "," + alreadyReadBytes + "," + fileSize;
+        msg.arg2 = (int) (alreadyReadBytes * 100f / fileSize);
+        msg.obj = name;
         mHandler.sendMessage(msg);
     }
 

@@ -16,4 +16,12 @@
 #define BROADCAST_ADDR "255.255.255.255"
 #define NULL_MSG " "
 
+#define USHORT u_int16_t
+#define UINT u_int32_t
+#define ULONG u_int64_t
+#define UCHAR unsigned char
+#define CHAR char
+#define TRUE 1
+#define FALSE 0
+
 #endif

@@ -20,12 +20,11 @@ public interface FileStatusListener {
     /**
      * 文件上传进度
      *
-     * @param flag     类型
-     * @param name     文件名称
-     * @param schedule 上传进度
-     * @param fileSize 文件总大小
+     * @param flag    类型
+     * @param name    文件名称
+     * @param percent 上传进度
      */
-    void upload(int flag, String name, long schedule, long fileSize);
+    void upload(int flag, String name, int percent);
 
     /**
      * 文件上传成功过

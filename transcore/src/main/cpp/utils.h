@@ -7,14 +7,26 @@
 
 #include <string>
 #include <vector>
+#include <jni.h>
+#include "const.h"
 
 using namespace std;
+
+typedef struct stSocketInfo {
+    char *sIp;
+    char *sPath;
+    int port;
+} SocketInfo, *PSocketInfo;
 
 class Utils {
 public:
     static vector<string> split(const string &str, const string &delim);
 
     static string getLocalIp(int sockfd);
+
+    static char *jstringToString(JNIEnv *env, jstring j_str);
+
+    static void int2Bytes(int iValue, UCHAR *aucArray, int iStartPos);
 };
 
 #endif //UDPDEMO_UTILS_H

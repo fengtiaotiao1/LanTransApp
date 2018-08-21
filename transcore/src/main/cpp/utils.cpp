@@ -24,7 +24,6 @@ vector<string> Utils::split(const string &str, const string &delim) {
         res.push_back(s); //存入结果数组
         p = strtok(NULL, d);
     }
-
     return res;
 }
 
@@ -52,5 +51,30 @@ string Utils::getLocalIp(int sockfd) {
         }
     }
     return ip;
+}
+
+char *Utils::jstringToString(JNIEnv *env, jstring jStr) {
+    char *ret = NULL;
+    jclass classString = env->FindClass("java/lang/String");
+    jstring strlenCode = env->NewStringUTF("utf-8");
+    jmethodID mid = env->GetMethodID(classString, "getBytes", "(Ljava/lang/String;)[B");
+    jbyteArray byteArray = (jbyteArray) env->CallObjectMethod(jStr, mid, strlenCode);
+    jsize alen = env->GetArrayLength(byteArray);
+    jbyte *ba = env->GetByteArrayElements(byteArray, JNI_FALSE);
+    if (alen > 0) {
+        ret = (char *) malloc((size_t) (alen + 1));
+        memset(ret, 0, strlen(ret));
+        memcpy(ret, ba, alen);
+        ret[alen] = 0;
+    }
+    env->ReleaseByteArrayElements(byteArray, ba, 0);
+    return ret;
+}
+
+void Utils::int2Bytes(int iValue, UCHAR *aucArray, int iStartPos) {
+    aucArray[iStartPos] = (iValue & 0xff000000) >> 24;
+    aucArray[iStartPos + 1] = (iValue & 0x00ff0000) >> 16;
+    aucArray[iStartPos + 2] = (iValue & 0x0000ff00) >> 8;
+    aucArray[iStartPos + 3] = (iValue & 0x000000ff);
 }
 
