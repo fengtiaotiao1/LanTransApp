@@ -44,4 +44,6 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved);
 
 void notify(int cmd, string srcAddr, string msg);
 
+void fileTransCallback(int state, int type, int process, string fileName);
+
 #endif //UDPDEMO_NATIVE_LIB_H

@@ -26,7 +26,9 @@ public:
 
     static char *jstringToString(JNIEnv *env, jstring j_str);
 
-    static void int2Bytes(int iValue, UCHAR *aucArray, int iStartPos);
+    static int calculateProcess(long processSize, long fileSize);
+
+    static void reverseByte(string s, int n);
 };
 
 #endif //UDPDEMO_UTILS_H

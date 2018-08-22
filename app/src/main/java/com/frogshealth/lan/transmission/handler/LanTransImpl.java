@@ -1,6 +1,7 @@
 package com.frogshealth.lan.transmission.handler;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.frogshealth.lan.transcore.JavaHelper;
 import com.frogshealth.lan.transmission.model.FileInfo;
@@ -18,6 +19,7 @@ import java.util.List;
  * @创建日期 18/8/20
  ***********************************************************************/
 public class LanTransImpl extends LanTransAgent {
+    private static final String TAG = "LanTransImpl";
     /**
      * JAVA2C辅助类
      */
@@ -44,11 +46,13 @@ public class LanTransImpl extends LanTransAgent {
         if (files == null || files.isEmpty()) {
             return;
         }
+        Log.e(TAG, "sendFiles: " +  "sendFiles(address, files.get(0).getPath());");
         mJ2CHelper.sendFiles(address, files.get(0).getPath());
     }
 
     @Override
     public void receiveFiles() {
+        Log.e(TAG, "receiveFiles: " + "receiveFiles() {");
         mJ2CHelper.receiveFiles(FileUtils.getFileSavePath(this.mContext).getAbsolutePath());
     }
 

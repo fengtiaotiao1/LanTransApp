@@ -4,12 +4,16 @@
 #include "unistd.h"
 #include "native-lib.h"
 #include "const.h"
+#include "tcp/socketSender.h"
+#include "tcp/socketReceiver.h"
 
 JavaVM *jvm = NULL;
 jclass global_clazz = NULL;
 jobject global_object = NULL;
 jmethodID m_udp_method = NULL;
 jmethodID m_file_method = NULL;
+
+extern "C" {
 
 JNIEXPORT void JNICALL
 Java_com_frogshealth_lan_transcore_JavaHelper_udpInit(JNIEnv *env, jobject obj) {
@@ -21,7 +25,7 @@ Java_com_frogshealth_lan_transcore_JavaHelper_udpInit(JNIEnv *env, jobject obj) 
     m_udp_method = env->GetMethodID(global_clazz, "onMsgNotify",
                                     "(ILjava/lang/String;Ljava/lang/String;)V");
     m_file_method = env->GetMethodID(global_clazz, "onFileTransNotify",
-                                     "(IILjava/lang/String;I)V");
+                                     "(IIILjava/lang/String;)V");
     UDP::initUdp();
 }
 
@@ -31,11 +35,11 @@ Java_com_frogshealth_lan_transcore_JavaHelper_sendFileReq(JNIEnv *env, jobject o
     if (destAddr == NULL) {
         return;
     }
-    const char *dest = env->GetStringUTFChars(destAddr, false);
+    const char *dest = env->GetStringUTFChars(destAddr, (jboolean *) false);
     if (fileName == NULL) {
         fileName = env->NewStringUTF(NULL_MSG);
     }
-    const char *name = env->GetStringUTFChars(fileName, false);
+    const char *name = env->GetStringUTFChars(fileName, (jboolean *) false);
     if (dest == NULL || fileName == NULL) {
         return;
     }
@@ -51,11 +55,11 @@ Java_com_frogshealth_lan_transcore_JavaHelper_rejectFileResp(JNIEnv *env, jobjec
     if (destAddr == NULL) {
         return;
     }
-    const char *dest = env->GetStringUTFChars(destAddr, false);
+    const char *dest = env->GetStringUTFChars(destAddr, (jboolean *) false);
     if (fileName == NULL) {
         fileName = env->NewStringUTF(NULL_MSG);
     }
-    const char *name = env->GetStringUTFChars(fileName, false);
+    const char *name = env->GetStringUTFChars(fileName, (jboolean *) false);
     if (dest == NULL || fileName == NULL) {
         return;
     }
@@ -71,11 +75,11 @@ Java_com_frogshealth_lan_transcore_JavaHelper_receiveFileResp(JNIEnv *env, jobje
     if (destAddr == NULL) {
         return;
     }
-    const char *dest = env->GetStringUTFChars(destAddr, false);
+    const char *dest = env->GetStringUTFChars(destAddr, (jboolean *) false);
     if (fileName == NULL) {
         fileName = env->NewStringUTF(NULL_MSG);
     }
-    const char *name = env->GetStringUTFChars(fileName, false);
+    const char *name = env->GetStringUTFChars(fileName, (jboolean *) false);
     if (dest == NULL || fileName == NULL) {
         return;
     }
@@ -102,12 +106,34 @@ JNIEXPORT void JNICALL
 Java_com_frogshealth_lan_transcore_JavaHelper_sendFiles(JNIEnv *env, jobject object,
                                                         jstring destAddr, jstring path) {
 
+    if (destAddr == NULL) {
+        return;
+    }
+    const char *sIp = env->GetStringUTFChars(destAddr, (jboolean *) false);
+    if (path == NULL) {
+        path = env->NewStringUTF(NULL_MSG);
+    }
+    const char *sPath = env->GetStringUTFChars(path, (jboolean *) false);
+    if (sIp == NULL || sPath == NULL) {
+        return;
+    }
+    new socketSender(sIp, sPath);
+    env->ReleaseStringUTFChars(destAddr, sIp);
+    env->ReleaseStringUTFChars(path, sPath);
 }
 
 JNIEXPORT void JNICALL
 Java_com_frogshealth_lan_transcore_JavaHelper_receiveFiles(JNIEnv *env, jobject object,
                                                            jstring path) {
-
+    if (path == NULL) {
+        return;
+    }
+    const char *sPath = env->GetStringUTFChars(path, (jboolean *) false);
+    if (sPath == NULL) {
+        path = env->NewStringUTF(NULL_MSG);
+    }
+    new socketReceiver(sPath);
+    env->ReleaseStringUTFChars(path, sPath);
 }
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
@@ -137,6 +163,8 @@ JNIEnv *getJNIEnv(int *needDetach) {
     return env;
 }
 
+}
+
 void notify(int cmd, string srcAddr, string msg) {
     int needDetach;
     JNIEnv *env = getJNIEnv(&needDetach);
@@ -149,4 +177,20 @@ void notify(int cmd, string srcAddr, string msg) {
     if (needDetach) {
         jvm->DetachCurrentThread();
     }
+}
+
+void fileTransCallback(int state, int type, int process, string fileName) {
+    int needsDetach;
+    JNIEnv *env = getJNIEnv(&needsDetach);
+
+    env->CallVoidMethod(global_object, m_file_method, state, type, process,
+                        env->NewStringUTF(fileName.c_str()));
+
+    jthrowable exception = env->ExceptionOccurred();
+    if (exception) {
+        env->ExceptionDescribe();
+    }
+
+    if (needsDetach)
+        jvm->DetachCurrentThread();
 }

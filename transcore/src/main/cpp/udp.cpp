@@ -83,7 +83,7 @@ void *UDP::recvData(void *arg) {
 
     if (bind(sockfd, (struct sockaddr *) &(addrto), sizeof(struct sockaddr_in)) == -1) {
         LOGD("bind error...");
-        return false;
+        return (void *)false;
     }
     int len = sizeof(sockaddr_in);
     char readMsg[50] = {0};
@@ -111,6 +111,8 @@ void *UDP::recvData(void *arg) {
         }
         sleep(1);
     }
+
+    return (void *)0;
 }
 
 void UDP::sendMsgNotify(int cmd, string srcAddr, string msg) {

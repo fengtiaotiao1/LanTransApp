@@ -11,6 +11,7 @@ cmake_minimum_required(VERSION 3.4.1)
 # Gradle automatically packages shared libraries with your APK.
 
 aux_source_directory (src/main/cpp EXE_SRC)
+aux_source_directory (src/main/cpp/tcp EXE_SRC_TCP)
 
 add_library( # Sets the name of the library.
              native-lib
@@ -19,7 +20,7 @@ add_library( # Sets the name of the library.
              SHARED
 
              # Provides a relative path to your source file(s).
-             ${EXE_SRC})
+             ${EXE_SRC} ${EXE_SRC_TCP})
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by

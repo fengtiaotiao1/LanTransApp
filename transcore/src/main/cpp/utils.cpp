@@ -71,10 +71,21 @@ char *Utils::jstringToString(JNIEnv *env, jstring jStr) {
     return ret;
 }
 
-void Utils::int2Bytes(int iValue, UCHAR *aucArray, int iStartPos) {
-    aucArray[iStartPos] = (iValue & 0xff000000) >> 24;
-    aucArray[iStartPos + 1] = (iValue & 0x00ff0000) >> 16;
-    aucArray[iStartPos + 2] = (iValue & 0x0000ff00) >> 8;
-    aucArray[iStartPos + 3] = (iValue & 0x000000ff);
+
+int Utils::calculateProcess(long processSize, long fileSize) {
+    int ret = (int) (processSize * 100 / fileSize);
+    if (ret >= 100) {
+        return 99;
+    }
+    return ret;
+}
+
+// 自定义反转字节
+void Utils::reverseByte(string s, int n) {
+    for (int i = 0, j = n - 1; i < j; i++, j--) {
+        char c = s[i];
+        s[i] = s[j];
+        s[j] = c;
+    }
 }
 

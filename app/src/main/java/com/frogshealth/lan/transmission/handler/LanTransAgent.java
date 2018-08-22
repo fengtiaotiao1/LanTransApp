@@ -7,6 +7,7 @@ import android.content.ServiceConnection;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.frogshealth.lan.transmission.listener.FileOperateListener;
 import com.frogshealth.lan.transmission.listener.FileStatusListener;
@@ -30,7 +31,7 @@ import java.util.List;
  * @创建日期 18/8/2
  ***********************************************************************/
 public class LanTransAgent {
-
+    private static final String TAG = "LanTransAgent";
     /**
      * 单例
      */
@@ -89,6 +90,7 @@ public class LanTransAgent {
      * @param files   文件列表
      */
     public void sendFiles(String address, List<FileInfo> files) {
+        Log.e(TAG, "sendFiles: " + "sendFile address");
         TransmissionForSend transmissionForSend = new TransmissionForSend();
         transmissionForSend.setFileInfoList(files);
         transmissionForSend.sendFiles(address, Const.DEFAULT_SERVER_PORT);

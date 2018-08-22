@@ -24,4 +24,17 @@
 #define TRUE 1
 #define FALSE 0
 
+// Tcp
+#define FILE_TRANS_PORT         3444
+
+#define TYPE_SEND               7
+#define TYPE_RECEIVE            8
+
+#define TRANS_START             9
+#define TRANS_FAILED            10
+#define TRANS_SUCCESS           11
+#define TRANS_UPLOAD            12
+
+
+
 #endif
