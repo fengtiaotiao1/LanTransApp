@@ -7,6 +7,7 @@
 #include <arpa/inet.h>
 #include <linux/if.h>
 #include "utils.h"
+#include "native-lib.h"
 
 vector<string> Utils::split(const string &str, const string &delim) {
     vector<string> res;
@@ -73,9 +74,9 @@ char *Utils::jstringToString(JNIEnv *env, jstring jStr) {
 
 
 int Utils::calculateProcess(long processSize, long fileSize) {
-    int ret = (int) (processSize * 100 / fileSize);
+    int ret = (int) ((processSize * 1.0 / fileSize) * 100);
     if (ret >= 100) {
-        return 99;
+        return 100;
     }
     return ret;
 }
@@ -88,4 +89,6 @@ void Utils::reverseByte(string s, int n) {
         s[j] = c;
     }
 }
+
+
 

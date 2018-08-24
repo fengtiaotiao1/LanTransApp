@@ -15,6 +15,9 @@
 
 #define BROADCAST_ADDR "255.255.255.255"
 #define NULL_MSG " "
+#define DEFAULT_SAVE_PATH "/mnt/internal_sd/download/files/"
+#define READY_TO_RECEIVE "START_SEND"
+#define SEND_FILEINFO "FILEINFO"
 
 #define USHORT u_int16_t
 #define UINT u_int32_t

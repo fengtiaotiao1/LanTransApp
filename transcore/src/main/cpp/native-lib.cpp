@@ -4,8 +4,8 @@
 #include "unistd.h"
 #include "native-lib.h"
 #include "const.h"
-#include "tcp/socketSender.h"
-#include "tcp/socketReceiver.h"
+#include "tcpclient.h"
+#include "tcpserver.h"
 
 JavaVM *jvm = NULL;
 jclass global_clazz = NULL;
@@ -27,6 +27,7 @@ Java_com_frogshealth_lan_transcore_JavaHelper_udpInit(JNIEnv *env, jobject obj) 
     m_file_method = env->GetMethodID(global_clazz, "onFileTransNotify",
                                      "(IIILjava/lang/String;)V");
     UDP::initUdp();
+    TcpServer::initServerSocket();
 }
 
 JNIEXPORT void JNICALL
@@ -117,23 +118,21 @@ Java_com_frogshealth_lan_transcore_JavaHelper_sendFiles(JNIEnv *env, jobject obj
     if (sIp == NULL || sPath == NULL) {
         return;
     }
-    new socketSender(sIp, sPath);
-    env->ReleaseStringUTFChars(destAddr, sIp);
-    env->ReleaseStringUTFChars(path, sPath);
+    TcpClient::initClientSocket(sIp, sPath);
+//    env->ReleaseStringUTFChars(destAddr, sIp);
+//    env->ReleaseStringUTFChars(path, sPath);
 }
 
 JNIEXPORT void JNICALL
 Java_com_frogshealth_lan_transcore_JavaHelper_receiveFiles(JNIEnv *env, jobject object,
                                                            jstring path) {
     if (path == NULL) {
-        return;
+        path = env->NewStringUTF(DEFAULT_SAVE_PATH);
     }
     const char *sPath = env->GetStringUTFChars(path, (jboolean *) false);
-    if (sPath == NULL) {
-        path = env->NewStringUTF(NULL_MSG);
-    }
-    new socketReceiver(sPath);
-    env->ReleaseStringUTFChars(path, sPath);
+    LOGE("path is: %s", sPath);
+    TcpServer::startReceive(sPath);
+//    env->ReleaseStringUTFChars(path, sPath);
 }
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
@@ -191,6 +190,7 @@ void fileTransCallback(int state, int type, int process, string fileName) {
         env->ExceptionDescribe();
     }
 
-    if (needsDetach)
+    if (needsDetach) {
         jvm->DetachCurrentThread();
+    }
 }

@@ -52,11 +52,11 @@ public class JavaHelper {
      * @param percent  传输百分比
      */
     public void onFileTransNotify(final int status, final int flag, final int percent, String fileName) {
-        Log.e("JavaHelper== ", "onFileTransNotify " + status + " // " + flag + " // " + fileName + " // " + percent);
+//        Log.e("JavaHelper== ", "onFileTransNotify " + status + " // " + flag + " // " + fileName + " // " + percent);
         if (mHandler == null) {
             return;
         }
-        if (status == 7) {
+        if (status == 10) {
             return;
         }
         Message message = mHandler.obtainMessage(status);

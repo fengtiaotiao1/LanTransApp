@@ -13,9 +13,9 @@
 using namespace std;
 
 typedef struct stSocketInfo {
-    char *sIp;
-    char *sPath;
-    int port;
+    char *path;
+    char *ip;
+    int socket;
 } SocketInfo, *PSocketInfo;
 
 class Utils {
@@ -29,6 +29,7 @@ public:
     static int calculateProcess(long processSize, long fileSize);
 
     static void reverseByte(string s, int n);
+
 };
 
 #endif //UDPDEMO_UTILS_H

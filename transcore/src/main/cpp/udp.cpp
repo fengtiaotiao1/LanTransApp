@@ -40,7 +40,7 @@ void UDP::initUdp() {
     }
     //启动udp接收线程
     pthread_t id;
-    ret = pthread_create(&id, NULL, recvData, (void *) &sockfd);
+    ret = pthread_create(&id, NULL, recvData, &sockfd);
     if (ret < 0) {
         LOGD("create thread error...");
         ::close(sockfd);
@@ -83,7 +83,7 @@ void *UDP::recvData(void *arg) {
 
     if (bind(sockfd, (struct sockaddr *) &(addrto), sizeof(struct sockaddr_in)) == -1) {
         LOGD("bind error...");
-        return (void *)false;
+        return (void *) false;
     }
     int len = sizeof(sockaddr_in);
     char readMsg[50] = {0};
@@ -112,7 +112,7 @@ void *UDP::recvData(void *arg) {
         sleep(1);
     }
 
-    return (void *)0;
+    return (void *) 0;
 }
 
 void UDP::sendMsgNotify(int cmd, string srcAddr, string msg) {
