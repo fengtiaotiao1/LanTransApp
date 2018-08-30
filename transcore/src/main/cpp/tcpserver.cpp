@@ -141,3 +141,9 @@ void TcpServer::sendFileProcess(int state, int process, string filename) {
     }
 }
 
+void TcpServer::release() {
+    if (serverSocket >= 0) {
+        close(serverSocket);
+    }
+}
+

@@ -67,7 +67,7 @@ void UDP::sendUdpData(int cmd, string destAddr, string msg) {
     char sendMsg[50];
     strcpy(sendMsg, udpMsg.toString().c_str());
     LOGD("send msg is: %s", sendMsg);
-    int ret = sendto(sockfd, sendMsg, strlen(sendMsg), 0, (sockaddr *) &addrto, sizeof(addrto));
+    ssize_t ret = sendto(sockfd, sendMsg, strlen(sendMsg), 0, (sockaddr *) &addrto, sizeof(addrto));
     if (ret < 0) {
         LOGD("send data error....");
     }
@@ -90,14 +90,14 @@ void *UDP::recvData(void *arg) {
 
     while (isRecv) {
         memset(readMsg, 0, sizeof(readMsg));
-        int ret = recvfrom(sockfd, readMsg, sizeof(readMsg), 0, (struct sockaddr *) &addrto,
-                           (socklen_t *) &len);
+        ssize_t ret = recvfrom(sockfd, readMsg, sizeof(readMsg), 0, (struct sockaddr *) &addrto,
+                               (socklen_t *) &len);
         string fromAddr = inet_ntoa(addrto.sin_addr);
         LOGD("receive from %s, msg is: %s", fromAddr.c_str(), readMsg);
         if (ret <= 0) {
             LOGD("read data error....");
         } else {
-            if (fromAddr.compare(localIp) == 0) {
+            if (strcmp(fromAddr.c_str(), localIp.c_str()) == 0) {
                 continue;
             }
             vector<string> array = Utils::split(readMsg, ":");
@@ -117,4 +117,10 @@ void *UDP::recvData(void *arg) {
 
 void UDP::sendMsgNotify(int cmd, string srcAddr, string msg) {
     notify(cmd, srcAddr, msg);
+}
+
+void UDP::release() {
+    if (sockfd >= 0) {
+        close(sockfd);
+    }
 }

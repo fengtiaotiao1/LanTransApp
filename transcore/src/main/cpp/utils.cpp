@@ -1,11 +1,9 @@
 //
 // Created by 袁锦凤 on 18/8/17.
 //
-#include <unistd.h>
-#include <string.h>
-#include <netdb.h>
 #include <arpa/inet.h>
-#include <linux/if.h>
+#include <net/if.h>
+#include <sys/ioctl.h>
 #include "utils.h"
 #include "native-lib.h"
 
@@ -44,7 +42,7 @@ string Utils::getLocalIp(int sockfd) {
     for (int i = (ifconf.ifc_len / sizeof(struct ifreq)); i > 0; i++) {
         if (ifreq->ifr_flags == AF_INET) {
             string name = ifreq->ifr_name;
-            if (name.compare("wlan0") == 0) {
+            if (strcmp(name.c_str(), "wlan0") == 0) {
                 ip = inet_ntoa(((struct sockaddr_in *) &(ifreq->ifr_addr))->sin_addr);
                 break;
             }

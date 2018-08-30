@@ -15,6 +15,7 @@ public:
     static void startReceive(string path);
     static void *recvData(void *arg);
     static void sendFileProcess(int state, int process, string filename);
+    static void release();
 };
 
 #endif //LANTRANSAPP_TCPSERVER_H

@@ -19,6 +19,8 @@ public:
 
     static void sendMsgNotify(int cmd, string srcAddr, string msg);
 
+    static void release();
+
 };
 
 #endif

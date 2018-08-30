@@ -15,6 +15,9 @@ JNIEXPORT void JNICALL
 Java_com_frogshealth_lan_transcore_JavaHelper_udpInit(JNIEnv *env, jobject obj);
 
 JNIEXPORT void JNICALL
+Java_com_frogshealth_lan_transcore_JavaHelper_release(JNIEnv *env, jobject obj);
+
+JNIEXPORT void JNICALL
 Java_com_frogshealth_lan_transcore_JavaHelper_sendFileReq(JNIEnv *env, jobject obj,
                                                           jstring destAddr, jstring fileName);
 JNIEXPORT void JNICALL

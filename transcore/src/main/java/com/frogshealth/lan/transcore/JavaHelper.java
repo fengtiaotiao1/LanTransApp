@@ -68,6 +68,8 @@ public class JavaHelper {
 
     public native void udpInit();
 
+    public native void release();
+
     public native void sendFileReq(String destAddress, String fileName);
 
     public native void rejectFileResp(String destAddress, String fileName);

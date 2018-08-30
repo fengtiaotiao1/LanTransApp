@@ -13,7 +13,6 @@ jobject global_object = NULL;
 jmethodID m_udp_method = NULL;
 jmethodID m_file_method = NULL;
 
-extern "C" {
 
 JNIEXPORT void JNICALL
 Java_com_frogshealth_lan_transcore_JavaHelper_udpInit(JNIEnv *env, jobject obj) {
@@ -28,6 +27,12 @@ Java_com_frogshealth_lan_transcore_JavaHelper_udpInit(JNIEnv *env, jobject obj) 
                                      "(IIILjava/lang/String;)V");
     UDP::initUdp();
     TcpServer::initServerSocket();
+}
+
+JNIEXPORT void JNICALL
+Java_com_frogshealth_lan_transcore_JavaHelper_release(JNIEnv *env, jobject obj) {
+    UDP::release();
+    TcpServer::release();
 }
 
 JNIEXPORT void JNICALL
@@ -160,8 +165,6 @@ JNIEnv *getJNIEnv(int *needDetach) {
         *needDetach = 1;
     }
     return env;
-}
-
 }
 
 void notify(int cmd, string srcAddr, string msg) {
