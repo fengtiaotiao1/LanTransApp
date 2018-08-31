@@ -44,6 +44,10 @@ public class Const {
      */
     public static final int MSG_FILE_SEND_REQUEST = 6;
     /**
+     * 发送聊天消息
+     */
+    public static final int MSG_RECV_CHAT_MSG = 7;
+    /**
      * 是发送
      */
     public static final int SEND = 7;

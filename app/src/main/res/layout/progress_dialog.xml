@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#B0000000"
+    android:gravity="center">
+
+    <com.frogshealth.lan.transmission.view.FileProgressView
+        android:id="@+id/send_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+    <com.frogshealth.lan.transmission.view.FileProgressView
+        android:id="@+id/recv_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/send_progress"
+        android:layout_marginTop="100dp"
+        android:visibility="gone" />
+
+</RelativeLayout>

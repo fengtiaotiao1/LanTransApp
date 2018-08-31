@@ -17,7 +17,7 @@
 #include <sys/stat.h>
 
 static int serverSocket;
-static int recvProcess;
+static int recvProcess = -1;
 
 void TcpServer::initServerSocket() {
     serverSocket = socket(AF_INET, SOCK_STREAM, 0);
@@ -114,8 +114,7 @@ void *TcpServer::recvData(void *arg) {
     }
 
     //接收到的消息存入文件
-    recvProcess = 0;
-    sendFileProcess(TRANS_START, recvProcess, fileName);
+    sendFileProcess(TRANS_START, 0, fileName);
     int ret;
     long recvSize = 0;
     while ((ret = (int) recv(clientSocket, buffer, sizeof(buffer), 0)) > 0) {
@@ -130,6 +129,7 @@ void *TcpServer::recvData(void *arg) {
     close(clientSocket);
     free(savePath);
     free(socketInfo);
+    sendFileProcess(TRANS_SUCCESS, -1, fileName);
     LOGE("server receive success");
     return (void *) 0;
 }

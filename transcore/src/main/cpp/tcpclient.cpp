@@ -15,7 +15,7 @@
 #include <sstream>
 #include <sys/stat.h>
 
-static int sendProcess;
+static int sendProcess = -1;
 
 void TcpClient::initClientSocket(string address, string path) {
     int clientSocket = socket(AF_INET, SOCK_STREAM, 0);
@@ -103,8 +103,7 @@ void *TcpClient::recvData(void *arg) {
         return (void *) 0;
     }
     bzero(buffer, sizeof(buffer));
-    sendProcess = 0;
-    sendFileProcess(TRANS_START, sendProcess, fileName);
+    sendFileProcess(TRANS_START, 0, fileName);
     long sendSize = 0;
     while ((ret = (int) fread(buffer, sizeof(char), 1024, fp)) > 0) {
         if ((send(clientSocket, buffer, ret, 0)) < 0) {
@@ -119,6 +118,7 @@ void *TcpClient::recvData(void *arg) {
     free(socketInfo->ip);
     free(socketInfo);
     close(clientSocket);
+    sendFileProcess(TRANS_SUCCESS, -1, fileName);
     LOGE("client send success");
 
     return (void *) 0;

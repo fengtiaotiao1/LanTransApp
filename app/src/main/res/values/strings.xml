@@ -23,4 +23,7 @@
         <item>音乐</item>
         <item>视频</item>
     </string-array>
+    <string name="send_file_progress_title">当前发送文件名称：%1$s</string>
+    <string name="recv_file_progress_title">当前接收文件名称：%1$s</string>
+    <string name="chat_with_title">正在和 %1$s 聊天</string>
 </resources>

@@ -34,7 +34,7 @@ public class JavaHelper {
      * @param msg     携带消息
      */
     public void onMsgNotify(final int cmd, final String address, final String msg) {
-        Log.e("JavaHelper== ", "onMsgNotify " + cmd + " // " + address + " // " + msg);
+//        Log.e("JavaHelper== ", "onMsgNotify " + cmd + " // " + address + " // " + msg);
         if (mHandler == null) {
             return;
         }
@@ -69,6 +69,8 @@ public class JavaHelper {
     public native void udpInit();
 
     public native void release();
+
+    public native void sendChatMsg(String destAddress, String chatMsg);
 
     public native void sendFileReq(String destAddress, String fileName);
 

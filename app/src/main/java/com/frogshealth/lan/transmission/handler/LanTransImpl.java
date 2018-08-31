@@ -46,7 +46,7 @@ public class LanTransImpl extends LanTransAgent {
         if (files == null || files.isEmpty()) {
             return;
         }
-        Log.e(TAG, "sendFiles: " +  "sendFiles(address, files.get(0).getPath());");
+        Log.e(TAG, "sendFiles: " + "sendFiles(address, files.get(0).getPath());");
         mJ2CHelper.sendFiles(address, files.get(0).getPath());
     }
 
@@ -57,7 +57,13 @@ public class LanTransImpl extends LanTransAgent {
     }
 
     @Override
+    public void sendChatMsg(String address, String msg) {
+        mJ2CHelper.sendChatMsg(address, msg);
+    }
+
+    @Override
     public List<LanUser> getLanUsers() {
+        mJ2CHelper.onlineNotify();
         return null;
     }
 

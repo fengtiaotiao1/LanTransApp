@@ -20,8 +20,10 @@ public interface FileOperateListener {
 
     /**
      * 接收
+     *
+     * @param address 地址
      */
-    void onReceive();
+    void onReceive(String address);
 
     /**
      * 拒绝

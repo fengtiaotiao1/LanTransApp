@@ -36,6 +36,24 @@ Java_com_frogshealth_lan_transcore_JavaHelper_release(JNIEnv *env, jobject obj) 
 }
 
 JNIEXPORT void JNICALL
+Java_com_frogshealth_lan_transcore_JavaHelper_sendChatMsg(JNIEnv *env, jobject obj,
+                                                          jstring destAddr, jstring chatMsg) {
+    //发送空消息不处理
+    if (destAddr == NULL || chatMsg == NULL) {
+        return;
+    }
+    const char *dest = env->GetStringUTFChars(destAddr, (jboolean *) false);
+    const char *msg = env->GetStringUTFChars(chatMsg, (jboolean *) false);
+    if (dest == NULL || msg == NULL) {
+        return;
+    }
+    UDP::sendUdpData(CMD_TYPE_SEND_CHAT_MSG, dest, msg);
+
+    env->ReleaseStringUTFChars(destAddr, dest);
+    env->ReleaseStringUTFChars(chatMsg, msg);
+}
+
+JNIEXPORT void JNICALL
 Java_com_frogshealth_lan_transcore_JavaHelper_sendFileReq(JNIEnv *env, jobject obj,
                                                           jstring destAddr, jstring fileName) {
     if (destAddr == NULL) {

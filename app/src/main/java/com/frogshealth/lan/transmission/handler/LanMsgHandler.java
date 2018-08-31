@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 
+import com.frogshealth.lan.transmission.listener.ChatMsgListener;
 import com.frogshealth.lan.transmission.listener.FileOperateListener;
 import com.frogshealth.lan.transmission.listener.FileStatusListener;
 import com.frogshealth.lan.transmission.listener.UserStateListener;
@@ -31,6 +32,10 @@ public class LanMsgHandler extends Handler {
      */
     private final List<UserStateListener> mUserListeners = new ArrayList<>();
     /**
+     * 监听列表
+     */
+    private final List<ChatMsgListener> mChatListeners = new ArrayList<>();
+    /**
      * 文件传输状态监听
      */
     private FileStatusListener mFileReceiveListener;
@@ -56,6 +61,10 @@ public class LanMsgHandler extends Handler {
                 } else {
                     handleFileMsg(msg.what, (String) objects[0], (String) objects[1]);
                 }
+                break;
+            case Const.MSG_RECV_CHAT_MSG:
+                objects = (Object[]) msg.obj;
+                handleChatMsg((String) objects[1]);
                 break;
             case Const.MSG_ONLINE_ANSWER:
             case Const.MSG_USER_ONLINE:
@@ -227,6 +236,32 @@ public class LanMsgHandler extends Handler {
     }
 
     /**
+     * 注册监听
+     *
+     * @param listener 监听
+     */
+    public void registerChatListener(ChatMsgListener listener) {
+        synchronized (mChatListeners) {
+            if (!mChatListeners.contains(listener)) {
+                mChatListeners.add(listener);
+            }
+        }
+    }
+
+    /**
+     * 反注册监听
+     *
+     * @param listener 监听
+     */
+    public void unregisterChatListener(ChatMsgListener listener) {
+        synchronized (mChatListeners) {
+            if (mChatListeners.contains(listener)) {
+                mChatListeners.remove(listener);
+            }
+        }
+    }
+
+    /**
      * 处理文件消息
      *
      * @param msgType 消息类型
@@ -241,7 +276,7 @@ public class LanMsgHandler extends Handler {
                 }
                 switch (msgType) {
                     case Const.MSG_FILE_RECEIVE:
-                        listener.onReceive();
+                        listener.onReceive(srcAddr);
                         break;
                     case Const.MSG_FILE_REJECT:
                         listener.onReject();
@@ -252,6 +287,22 @@ public class LanMsgHandler extends Handler {
                     default:
                         break;
                 }
+            }
+        }
+    }
+
+    /**
+     * 处理聊天消息
+     *
+     * @param chatMsg 聊天消息
+     */
+    private void handleChatMsg(String chatMsg) {
+        synchronized (mChatListeners) {
+            for (ChatMsgListener listener : mChatListeners) {
+                if (listener == null) {
+                    return;
+                }
+                listener.onChatMsg(chatMsg);
             }
         }
     }

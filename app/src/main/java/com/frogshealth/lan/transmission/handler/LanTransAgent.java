@@ -9,6 +9,7 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.frogshealth.lan.transmission.listener.ChatMsgListener;
 import com.frogshealth.lan.transmission.listener.FileOperateListener;
 import com.frogshealth.lan.transmission.listener.FileStatusListener;
 import com.frogshealth.lan.transmission.listener.UserStateListener;
@@ -159,6 +160,24 @@ public class LanTransAgent {
     }
 
     /**
+     * 注册监听
+     *
+     * @param listener 监听
+     */
+    public void registerChatListener(ChatMsgListener listener) {
+        mHandler.registerChatListener(listener);
+    }
+
+    /**
+     * 反注册监听
+     *
+     * @param listener 监听
+     */
+    public void unregisterChatListener(ChatMsgListener listener) {
+        mHandler.unregisterChatListener(listener);
+    }
+
+    /**
      * 获取局域网用户
      *
      * @return 局域网用户列表
@@ -192,6 +211,16 @@ public class LanTransAgent {
      */
     public void rejectFile(String toAddress) {
         NetUdpHelper.getInstance().rejectFile(toAddress);
+    }
+
+    /**
+     * 发送聊天消息
+     *
+     * @param address 地址
+     * @param msg     消息
+     */
+    public void sendChatMsg(String address, String msg) {
+
     }
 
     /**

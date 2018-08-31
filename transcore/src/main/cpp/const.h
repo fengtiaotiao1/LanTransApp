@@ -12,6 +12,7 @@
 #define CMD_TYPE_RECV_FILE       4
 #define CMD_TYPE_REJECT_FILE     5
 #define CMD_TYPE_SEND_FILE       6
+#define CMD_TYPE_SEND_CHAT_MSG   7
 
 #define BROADCAST_ADDR "255.255.255.255"
 #define NULL_MSG " "

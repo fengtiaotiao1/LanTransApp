@@ -64,7 +64,7 @@ void UDP::sendUdpData(int cmd, string destAddr, string msg) {
     addrto.sin_family = AF_INET;
     addrto.sin_addr.s_addr = inet_addr(udpMsg.getDestAddr().c_str());
     addrto.sin_port = htons(udpMsg.getPort());
-    char sendMsg[50];
+    char sendMsg[1024];
     strcpy(sendMsg, udpMsg.toString().c_str());
     LOGD("send msg is: %s", sendMsg);
     ssize_t ret = sendto(sockfd, sendMsg, strlen(sendMsg), 0, (sockaddr *) &addrto, sizeof(addrto));
@@ -86,7 +86,7 @@ void *UDP::recvData(void *arg) {
         return (void *) false;
     }
     int len = sizeof(sockaddr_in);
-    char readMsg[50] = {0};
+    char readMsg[1024] = {0};
 
     while (isRecv) {
         memset(readMsg, 0, sizeof(readMsg));
