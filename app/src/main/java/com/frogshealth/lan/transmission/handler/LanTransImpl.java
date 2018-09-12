@@ -46,13 +46,13 @@ public class LanTransImpl extends LanTransAgent {
         if (files == null || files.isEmpty()) {
             return;
         }
-        Log.e(TAG, "sendFiles: " + "sendFiles(address, files.get(0).getPath());");
+        Log.e(TAG, "sendFiles: " + files.get(0).getPath());
         mJ2CHelper.sendFiles(address, files.get(0).getPath());
     }
 
     @Override
     public void receiveFiles() {
-        Log.e(TAG, "receiveFiles: " + "receiveFiles() {");
+        Log.e(TAG, "receiveFiles: " + FileUtils.getFileSavePath(this.mContext).getAbsolutePath());
         mJ2CHelper.receiveFiles(FileUtils.getFileSavePath(this.mContext).getAbsolutePath());
     }
 

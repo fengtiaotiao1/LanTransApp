@@ -90,8 +90,7 @@ void *UDP::recvData(void *arg) {
 
     while (isRecv) {
         memset(readMsg, 0, sizeof(readMsg));
-        ssize_t ret = recvfrom(sockfd, readMsg, sizeof(readMsg), 0, (struct sockaddr *) &addrto,
-                               (socklen_t *) &len);
+        ssize_t ret = recvfrom(sockfd, readMsg, sizeof(readMsg), 0, (struct sockaddr *) &addrto, &len);
         string fromAddr = inet_ntoa(addrto.sin_addr);
         LOGD("receive from %s, msg is: %s", fromAddr.c_str(), readMsg);
         if (ret <= 0) {

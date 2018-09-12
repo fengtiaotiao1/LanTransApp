@@ -63,7 +63,7 @@ void *TcpClient::recvData(void *arg) {
     LOGE("client connect success");
 
     //获取文件名
-    vector<string> array = Utils::split(path, "/");
+    vector<string> array = Utils::split(path, "/\\");
     if (array.size() == 0) {
         close(clientSocket);
         return (void *) 0;
@@ -88,7 +88,7 @@ void *TcpClient::recvData(void *arg) {
     send(clientSocket, fileInfo.str().c_str(), fileInfo.str().size(), 0);
     //向服务端发送文件名和文件大小
     char buffer[1024];
-    bzero(buffer, 1024);
+    bzero(buffer, sizeof(buffer));
     while (recv(clientSocket, buffer, sizeof(buffer), 0) > 0) {
         LOGE("from server msg: %s", buffer);
         if (!strcmp(buffer, READY_TO_RECEIVE)) {
@@ -105,13 +105,13 @@ void *TcpClient::recvData(void *arg) {
     bzero(buffer, sizeof(buffer));
     sendFileProcess(TRANS_START, 0, fileName);
     long sendSize = 0;
-    while ((ret = (int) fread(buffer, sizeof(char), 1024, fp)) > 0) {
+    while ((ret = (int) fread(buffer, sizeof(char), sizeof(buffer), fp)) > 0) {
         if ((send(clientSocket, buffer, ret, 0)) < 0) {
             break;
         }
         sendSize += ret;
         sendFileProcess(TRANS_UPLOAD, Utils::calculateProcess(sendSize, fileSize), fileName);
-        bzero(buffer, 1024);
+        bzero(buffer, sizeof(buffer));
     }
     fclose(fp);
     free(socketInfo->path);

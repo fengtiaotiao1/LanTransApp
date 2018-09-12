@@ -72,8 +72,7 @@ void *TcpServer::recvData(void *arg) {
     bzero(&clientAddr, sizeof(clientAddr));
     int len = sizeof(clientAddr);
     LOGE("waiting to receive connection");
-    int clientSocket = accept(serverSocket, (struct sockaddr *) &clientAddr,
-                              (socklen_t *) &len);
+    int clientSocket = accept(serverSocket, (struct sockaddr *) &clientAddr, &len);
     if (clientSocket == -1) {
         LOGE("accept error");
         return (void *) 0;
@@ -81,6 +80,7 @@ void *TcpServer::recvData(void *arg) {
     LOGE("client connect success");
 
     char buffer[1024];
+    bzero(buffer, sizeof(buffer));
     while (recv(clientSocket, buffer, sizeof(buffer), 0) > 0) {
         vector<string> array = Utils::split(buffer, ":");
         if (array.size() > 0 && !strcmp(array[0].c_str(), SEND_FILEINFO)) {
@@ -94,7 +94,7 @@ void *TcpServer::recvData(void *arg) {
     vector<string> array = Utils::split(buffer, ":");
     string fileName = array[1];
     long fileSize = atoi(array[2].c_str());
-    bzero(buffer, 1024);
+    bzero(buffer, sizeof(buffer));
 
     if (access(path.c_str(), 6) < 0) {
         mkdir(path.c_str(), 6);
@@ -121,7 +121,7 @@ void *TcpServer::recvData(void *arg) {
         if (fwrite(buffer, sizeof(char), ret, fp) <= 0) {
             break;
         }
-        bzero(buffer, 1024);
+        bzero(buffer, sizeof(buffer));
         recvSize += ret;
         sendFileProcess(TRANS_UPLOAD, Utils::calculateProcess(recvSize, fileSize), fileName);
     }

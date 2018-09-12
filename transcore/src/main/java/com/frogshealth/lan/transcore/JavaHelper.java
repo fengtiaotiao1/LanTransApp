@@ -34,7 +34,7 @@ public class JavaHelper {
      * @param msg     携带消息
      */
     public void onMsgNotify(final int cmd, final String address, final String msg) {
-//        Log.e("JavaHelper== ", "onMsgNotify " + cmd + " // " + address + " // " + msg);
+        Log.e("JavaHelper== ", "onMsgNotify " + cmd + " // " + address + " // " + msg);
         if (mHandler == null) {
             return;
         }
@@ -52,7 +52,7 @@ public class JavaHelper {
      * @param percent  传输百分比
      */
     public void onFileTransNotify(final int status, final int flag, final int percent, String fileName) {
-//        Log.e("JavaHelper== ", "onFileTransNotify " + status + " // " + flag + " // " + fileName + " // " + percent);
+        Log.e("JavaHelper== ", "onFileTransNotify " + status + " // " + flag + " // " + fileName + " // " + percent);
         if (mHandler == null) {
             return;
         }
