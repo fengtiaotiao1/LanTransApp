@@ -7,6 +7,12 @@
 #include "tcpclient.h"
 #include "tcpserver.h"
 
+
+extern "C" {
+#include "db/sqlitehelp.h"
+#include "db/transdb.h"
+#include "db/tblsqlconst.h"
+}
 JavaVM *jvm = NULL;
 jclass global_clazz = NULL;
 jobject global_object = NULL;
@@ -25,6 +31,7 @@ Java_com_frogshealth_lan_transcore_JavaHelper_udpInit(JNIEnv *env, jobject obj) 
                                     "(ILjava/lang/String;Ljava/lang/String;)V");
     m_file_method = env->GetMethodID(global_clazz, "onFileTransNotify",
                                      "(IIILjava/lang/String;)V");
+    openLanTransDb("/mnt/internal_sd/Download/lanTrans.db");
     UDP::initUdp();
     TcpServer::initServerSocket();
 }
@@ -156,6 +163,76 @@ Java_com_frogshealth_lan_transcore_JavaHelper_receiveFiles(JNIEnv *env, jobject 
     LOGE("path is: %s", sPath);
     TcpServer::startReceive(sPath);
 //    env->ReleaseStringUTFChars(path, sPath);
+}
+
+JNIEXPORT void JNICALL
+Java_com_frogshealth_lan_transcore_JavaHelper_deleteDb(JNIEnv *env, jobject object, jint type, jint groupId, jstring name) {
+    if (3 != type) {
+        if (name == NULL) {
+            name = env->NewStringUTF("JACK");
+        }
+        if (NULL == groupId) {
+            groupId = 1;
+        }
+        const char *sName = env->GetStringUTFChars(name, (jboolean *) false);
+        LOGD("path is : %s", sName);
+        PTransInfo pTransInfo = (PTransInfo) malloc(sizeof(TransInfo));
+        strcpy(pTransInfo->trans_name, sName);
+        pTransInfo->trans_group_id = groupId;
+        if (1 == type) {
+            deleteOneTransData(pTransInfo);
+        } else if (2 == type) {
+            deleteOneGroupData(pTransInfo);
+        } else if (4 == type) {
+            deleteNameTransData(pTransInfo);
+        }
+        free(pTransInfo);
+    } else {
+        deleteAllTransData();
+    }
+    if (5 == type) {
+        PTransInfo pTransInfo = NULL;
+        int iNum = 0;
+        int iQRet = queryAllTransTblData(&pTransInfo, &iNum);
+        if (DB_SUCCESS != iQRet) {
+            return;
+        }
+        LOGD("trans table data is %d", iNum);
+
+        for (int i = 0; i < iNum; i ++) {
+            LOGE("Data: groupId: %d, name: %s, addr: %s", (pTransInfo + i)->trans_group_id, (pTransInfo + i)->trans_name, (pTransInfo + i)->trans_addr);
+        }
+    }
+}
+
+JNIEXPORT void JNICALL
+Java_com_frogshealth_lan_transcore_JavaHelper_insertDb(JNIEnv *env, jobject object, jstring name,
+                                                       jstring addr, jint id) {
+    const char *sName = env->GetStringUTFChars(name, (jboolean *) false);
+    const char *sAddr = env->GetStringUTFChars(addr, (jboolean *) false);
+    LOGD("insert data is : %s, %s, %d.", sName, sAddr, id);
+    PTransInfo pTransInfo = (PTransInfo) malloc(sizeof(TransInfo));
+    strcpy(pTransInfo->trans_name, sName);
+    strcpy(pTransInfo->trans_addr, sAddr);
+    pTransInfo->trans_group_id = id;
+
+    insertOneTransTblData(pTransInfo);
+    free(pTransInfo);
+}
+
+JNIEXPORT void JNICALL
+Java_com_frogshealth_lan_transcore_JavaHelper_updateDb(JNIEnv *env, jobject object, jstring name,
+                                                       jstring addr, jint id) {
+    const char *sName = env->GetStringUTFChars(name, (jboolean *) false);
+    const char *sAddr = env->GetStringUTFChars(addr, (jboolean *) false);
+    LOGD("insert data is : %s, %s, %d.", sName, sAddr, id);
+    PTransInfo pTransInfo = (PTransInfo) malloc(sizeof(TransInfo));
+    strcpy(pTransInfo->trans_name, sName);
+    strcpy(pTransInfo->trans_addr, sAddr);
+    pTransInfo->trans_group_id = id;
+
+    updateTransDataDeviceALLAddr(pTransInfo);
+    free(pTransInfo);
 }
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {

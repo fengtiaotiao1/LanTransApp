@@ -12,6 +12,7 @@ cmake_minimum_required(VERSION 3.4.1)
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/jniLibs/${ANDROID_ABI})
 aux_source_directory (src/main/cpp EXE_SRC)
+aux_source_directory (src/main/cpp/db EXE_SRC_DB)
 
 add_library( # Sets the name of the library.
              native-lib
@@ -20,7 +21,7 @@ add_library( # Sets the name of the library.
              SHARED
 
              # Provides a relative path to your source file(s).
-             ${EXE_SRC})
+             ${EXE_SRC} ${EXE_SRC_DB})
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
