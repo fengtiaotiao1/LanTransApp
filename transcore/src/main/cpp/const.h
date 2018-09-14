@@ -20,14 +20,6 @@
 #define READY_TO_RECEIVE "START_SEND"
 #define SEND_FILEINFO "FILEINFO"
 
-#define USHORT u_int16_t
-#define UINT u_int32_t
-#define ULONG u_int64_t
-#define UCHAR unsigned char
-#define CHAR char
-#define TRUE 1
-#define FALSE 0
-
 // Tcp
 #define FILE_TRANS_PORT         3444
 
@@ -38,6 +30,13 @@
 #define TRANS_FAILED            10
 #define TRANS_SUCCESS           11
 #define TRANS_UPLOAD            12
+
+
+typedef struct stGroupInfo {
+    char member_name[128];
+    char member_addr[128];
+    int group_id;
+} GroupInfo, *PGroupInfo;
 
 
 

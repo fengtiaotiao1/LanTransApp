@@ -17,14 +17,20 @@
 
 #define DEFAULT_SAVE_PATH "/mnt/internal_sd/download/files/"
 
+#define GROUP_TABLE_NAME "groupTbl"
+#define KEY_ID "id"
+#define GROUP_MEMBER_NAME "group_member_name"
+#define GROUP_MEMBER_ADDR "group_member_addr"
+#define GROUP_ID "group_id"
 
-#define CREATE_LAN_TRANS_TABLE_STR (\
-"create table if not exists lanTransTbl\
+
+#define CREATE_LAN_GROUP_TABLE_STR (\
+"create table if not exists groupTbl\
 (\
-trans_id INTEGER PRIMARY KEY AUTOINCREMENT,\
-trans_name VARCHAR(128) NOT NULL,\
-trans_addr VARCHAR(128) NOT NULL,\
-trans_group_id INTEGER\
+id INTEGER PRIMARY KEY AUTOINCREMENT,\
+group_member_name VARCHAR(128) NOT NULL,\
+group_member_addr VARCHAR(128) NOT NULL,\
+group_id INTEGER\
 );")
 
 #endif //LANTRANSAPP_TBLSQLCONST_H

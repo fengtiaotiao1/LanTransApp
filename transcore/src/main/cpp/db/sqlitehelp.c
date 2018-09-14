@@ -144,7 +144,7 @@ static void setVersion(sqlite3 *pDatabase, int version) {
 // 创建LanTrans的表格
 static int createLanTransTable(sqlite3 *db) {
     // 创建信息表格
-    createTable(db, CREATE_LAN_TRANS_TABLE_STR);
+    return createTable(db, CREATE_LAN_GROUP_TABLE_STR);
 }
 
 // 更新LanTrans数据库版本

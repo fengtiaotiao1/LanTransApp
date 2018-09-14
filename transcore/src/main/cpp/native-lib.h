@@ -50,11 +50,10 @@ JNIEXPORT void JNICALL
 Java_com_frogshealth_lan_transcore_JavaHelper_deleteDb(JNIEnv *env, jobject object, jint type, jint groupId, jstring name);
 
 JNIEXPORT void JNICALL
-Java_com_frogshealth_lan_transcore_JavaHelper_insertDb(JNIEnv *env, jobject object, jstring name, jstring addr, jint id);
+Java_com_frogshealth_lan_transcore_JavaHelper_addGroupMember(JNIEnv *env, jobject object, jstring name, jstring addr, jint id);
 
 JNIEXPORT void JNICALL
-Java_com_frogshealth_lan_transcore_JavaHelper_updateDb(JNIEnv *env, jobject object, jstring name,
-                                                       jstring addr, jint id);
+Java_com_frogshealth_lan_transcore_JavaHelper_updateMemberIpByName(JNIEnv *env, jobject object, jstring name);
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved);
 }

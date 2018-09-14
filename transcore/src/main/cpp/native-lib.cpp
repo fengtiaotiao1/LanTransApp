@@ -1,18 +1,10 @@
 #include <jni.h>
-#include "udp.h"
 #include "log.h"
 #include "unistd.h"
 #include "native-lib.h"
 #include "const.h"
-#include "tcpclient.h"
-#include "tcpserver.h"
+#include "lanTrans.h"
 
-
-extern "C" {
-#include "db/sqlitehelp.h"
-#include "db/transdb.h"
-#include "db/tblsqlconst.h"
-}
 JavaVM *jvm = NULL;
 jclass global_clazz = NULL;
 jobject global_object = NULL;
@@ -31,15 +23,13 @@ Java_com_frogshealth_lan_transcore_JavaHelper_udpInit(JNIEnv *env, jobject obj) 
                                     "(ILjava/lang/String;Ljava/lang/String;)V");
     m_file_method = env->GetMethodID(global_clazz, "onFileTransNotify",
                                      "(IIILjava/lang/String;)V");
-    openLanTransDb("/mnt/internal_sd/Download/lanTrans.db");
-    UDP::initUdp();
-    TcpServer::initServerSocket();
+    LanTrans::initDb("/mnt/internal_sd/Download/lanTrans.db");
+    LanTrans::initSocket();
 }
 
 JNIEXPORT void JNICALL
 Java_com_frogshealth_lan_transcore_JavaHelper_release(JNIEnv *env, jobject obj) {
-    UDP::release();
-    TcpServer::release();
+    LanTrans::release();
 }
 
 JNIEXPORT void JNICALL
@@ -54,7 +44,7 @@ Java_com_frogshealth_lan_transcore_JavaHelper_sendChatMsg(JNIEnv *env, jobject o
     if (dest == NULL || msg == NULL) {
         return;
     }
-    UDP::sendUdpData(CMD_TYPE_SEND_CHAT_MSG, dest, msg);
+    LanTrans::sendUdpData(CMD_TYPE_SEND_CHAT_MSG, dest, msg);
 
     env->ReleaseStringUTFChars(destAddr, dest);
     env->ReleaseStringUTFChars(chatMsg, msg);
@@ -74,7 +64,7 @@ Java_com_frogshealth_lan_transcore_JavaHelper_sendFileReq(JNIEnv *env, jobject o
     if (dest == NULL || fileName == NULL) {
         return;
     }
-    UDP::sendUdpData(CMD_TYPE_SEND_FILE, dest, name);
+    LanTrans::sendFileReq(dest, name);
 
     env->ReleaseStringUTFChars(destAddr, dest);
     env->ReleaseStringUTFChars(fileName, name);
@@ -94,7 +84,7 @@ Java_com_frogshealth_lan_transcore_JavaHelper_rejectFileResp(JNIEnv *env, jobjec
     if (dest == NULL || fileName == NULL) {
         return;
     }
-    UDP::sendUdpData(CMD_TYPE_REJECT_FILE, dest, name);
+    LanTrans::sendFileRejectResp(dest, name);
 
     env->ReleaseStringUTFChars(destAddr, dest);
     env->ReleaseStringUTFChars(fileName, name);
@@ -114,7 +104,7 @@ Java_com_frogshealth_lan_transcore_JavaHelper_receiveFileResp(JNIEnv *env, jobje
     if (dest == NULL || fileName == NULL) {
         return;
     }
-    UDP::sendUdpData(CMD_TYPE_RECV_FILE, dest, name);
+    LanTrans::sendFileRecvResp(dest, name);
 
     env->ReleaseStringUTFChars(destAddr, dest);
     env->ReleaseStringUTFChars(fileName, name);
@@ -123,14 +113,14 @@ Java_com_frogshealth_lan_transcore_JavaHelper_receiveFileResp(JNIEnv *env, jobje
 JNIEXPORT void JNICALL
 Java_com_frogshealth_lan_transcore_JavaHelper_onlineNotify(JNIEnv *env, jobject obj) {
 
-    UDP::sendUdpData(CMD_TYPE_ONLINE, BROADCAST_ADDR, NULL_MSG);
+    LanTrans::onlineNotify();
 
 }
 
 JNIEXPORT void JNICALL
 Java_com_frogshealth_lan_transcore_JavaHelper_offlineNotify(JNIEnv *env, jobject obj) {
 
-    UDP::sendUdpData(CMD_TYPE_OFFLINE, BROADCAST_ADDR, NULL_MSG);
+    LanTrans::offlineNotify();
 }
 
 JNIEXPORT void JNICALL
@@ -148,9 +138,9 @@ Java_com_frogshealth_lan_transcore_JavaHelper_sendFiles(JNIEnv *env, jobject obj
     if (sIp == NULL || sPath == NULL) {
         return;
     }
-    TcpClient::initClientSocket(sIp, sPath);
-//    env->ReleaseStringUTFChars(destAddr, sIp);
-//    env->ReleaseStringUTFChars(path, sPath);
+    LanTrans::sendFile(sIp, sPath);
+    env->ReleaseStringUTFChars(destAddr, sIp);
+    env->ReleaseStringUTFChars(path, sPath);
 }
 
 JNIEXPORT void JNICALL
@@ -161,8 +151,8 @@ Java_com_frogshealth_lan_transcore_JavaHelper_receiveFiles(JNIEnv *env, jobject 
     }
     const char *sPath = env->GetStringUTFChars(path, (jboolean *) false);
     LOGE("path is: %s", sPath);
-    TcpServer::startReceive(sPath);
-//    env->ReleaseStringUTFChars(path, sPath);
+    LanTrans::startReceive(sPath);
+    env->ReleaseStringUTFChars(path, sPath);
 }
 
 JNIEXPORT void JNICALL
@@ -175,64 +165,39 @@ Java_com_frogshealth_lan_transcore_JavaHelper_deleteDb(JNIEnv *env, jobject obje
             groupId = 1;
         }
         const char *sName = env->GetStringUTFChars(name, (jboolean *) false);
-        LOGD("path is : %s", sName);
-        PTransInfo pTransInfo = (PTransInfo) malloc(sizeof(TransInfo));
-        strcpy(pTransInfo->trans_name, sName);
-        pTransInfo->trans_group_id = groupId;
+        LOGD("name is : %s", sName);
+        PGroupInfo pTransInfo = (PGroupInfo) malloc(sizeof(GroupInfo));
+        strcpy(pTransInfo->member_name, sName);
+        pTransInfo->group_id = groupId;
         if (1 == type) {
-            deleteOneTransData(pTransInfo);
+            LanTrans::deleteGroupMember(groupId, sName);
         } else if (2 == type) {
-            deleteOneGroupData(pTransInfo);
+            LanTrans::deleteGroupById(groupId);
         } else if (4 == type) {
-            deleteNameTransData(pTransInfo);
+            LanTrans::deleteGroupMemberByName(sName);
         }
         free(pTransInfo);
     } else {
-        deleteAllTransData();
+        LanTrans::deleteGroups();
     }
-    if (5 == type) {
-        PTransInfo pTransInfo = NULL;
-        int iNum = 0;
-        int iQRet = queryAllTransTblData(&pTransInfo, &iNum);
-        if (DB_SUCCESS != iQRet) {
-            return;
-        }
-        LOGD("trans table data is %d", iNum);
 
-        for (int i = 0; i < iNum; i ++) {
-            LOGE("Data: groupId: %d, name: %s, addr: %s", (pTransInfo + i)->trans_group_id, (pTransInfo + i)->trans_name, (pTransInfo + i)->trans_addr);
-        }
-    }
 }
 
 JNIEXPORT void JNICALL
-Java_com_frogshealth_lan_transcore_JavaHelper_insertDb(JNIEnv *env, jobject object, jstring name,
+Java_com_frogshealth_lan_transcore_JavaHelper_addGroupMember(JNIEnv *env, jobject object, jstring name,
                                                        jstring addr, jint id) {
     const char *sName = env->GetStringUTFChars(name, (jboolean *) false);
     const char *sAddr = env->GetStringUTFChars(addr, (jboolean *) false);
     LOGD("insert data is : %s, %s, %d.", sName, sAddr, id);
-    PTransInfo pTransInfo = (PTransInfo) malloc(sizeof(TransInfo));
-    strcpy(pTransInfo->trans_name, sName);
-    strcpy(pTransInfo->trans_addr, sAddr);
-    pTransInfo->trans_group_id = id;
-
-    insertOneTransTblData(pTransInfo);
-    free(pTransInfo);
+    LanTrans::addGroupMember(id, sName, sAddr);
 }
 
 JNIEXPORT void JNICALL
-Java_com_frogshealth_lan_transcore_JavaHelper_updateDb(JNIEnv *env, jobject object, jstring name,
-                                                       jstring addr, jint id) {
+Java_com_frogshealth_lan_transcore_JavaHelper_updateMemberIpByName(JNIEnv *env, jobject object, jstring name, jstring ip) {
     const char *sName = env->GetStringUTFChars(name, (jboolean *) false);
-    const char *sAddr = env->GetStringUTFChars(addr, (jboolean *) false);
-    LOGD("insert data is : %s, %s, %d.", sName, sAddr, id);
-    PTransInfo pTransInfo = (PTransInfo) malloc(sizeof(TransInfo));
-    strcpy(pTransInfo->trans_name, sName);
-    strcpy(pTransInfo->trans_addr, sAddr);
-    pTransInfo->trans_group_id = id;
-
-    updateTransDataDeviceALLAddr(pTransInfo);
-    free(pTransInfo);
+    const char *sIp = env->GetStringUTFChars(ip, (jboolean *) false);
+    LOGD("update data is : %s, %s.", sName, sIp);
+    LanTrans::updateMemberIpByName(sName, sIp);
 }
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
